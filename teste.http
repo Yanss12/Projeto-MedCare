@@ -1,0 +1,30 @@
+POST http://127.0.0.1:8000/api/pacientes
+Content-Type: application/json
+
+{
+  "nome": "João Silva",
+  "cpf": "123.456.789-00",
+  "telefone": "(86) 99999-0000",
+  "data_nascimento": "1990-05-15"
+}
+###
+POST http://127.0.0.1:8000/api/profissionais
+Content-Type: application/json
+
+{
+  "nome": "Francisca Portela",
+  "especialidade": "Fisioterapia",
+  "crm": "000",
+  "telefone": "(86) 9999-92728",
+  "email": "francisca@clinica.com"
+}
+###
+POST http://127.0.0.1:8000/api/agendamentos
+Content-Type: application/json
+
+{
+  "paciente_id": 1,
+  "profissional_id": 1,
+  "data_hora": "2026-03-10 14:30:00",
+  "status": "agendado"
+}
