@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Agendamento;
+
+class AgendamentoController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return response()->json(Agendamento::all());
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $agendamento = Agendamento::create($request->all());
+        return response()->json($agendamento, 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+        return response()->json($agendamento);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+        $agendamento->update($request->all());
+        return response()->json($agendamento);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+        $agendamento->delete();
+        return response()->json(null, 204);
+    }
+}
