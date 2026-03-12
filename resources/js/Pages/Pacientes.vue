@@ -1,21 +1,19 @@
 <template>
   <Head title="Pacientes" />
   <Layout>
-    <div class="p-6 space-y-6">
-      <div
-        class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-      >
+    <div class="mx-auto w-full max-w-7xl pb-10">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-foreground">Pacientes</h1>
-          <p class="text-muted-foreground mt-1">
+          <h1 class="text-[32px] font-bold text-foreground tracking-tight">Pacientes</h1>
+          <p class="text-[14px] text-muted-foreground mt-1">
             Gerencie os pacientes cadastrados na clínica
           </p>
         </div>
 
         <Dialog v-model:open="isAddEditDialogOpen">
           <DialogTrigger as-child>
-            <Button @click="openAddDialog">
-              <Plus class="w-4 h-4 mr-2" />
+            <Button @click="openAddDialog" class="rounded-full shadow-md shadow-primary/20 px-6 py-6 font-bold text-[14px]">
+              <Plus class="w-5 h-5 mr-2" />
               Novo Paciente
             </Button>
           </DialogTrigger>
@@ -79,59 +77,60 @@
         </Dialog>
       </div>
 
-      <div class="relative">
-        <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"/>
-        <Input v-model="searchTerm" placeholder="Buscar por nome ou CPF..." class="pl-10"/>
+      <div class="relative w-full max-w-md mb-8">
+        <Search class="absolute left-5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"/>
+        <Input v-model="searchTerm" placeholder="Buscar por nome ou CPF..." class="h-14 w-full rounded-full border-0 bg-white pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium"/>
       </div>
 
-      <div class="grid gap-4">
-        <Card v-for="paciente in filteredPacientes" :key="paciente.id" class="hover:shadow-md transition-shadow">
-          <CardContent class="p-6">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div class="flex-1 space-y-3">
-                <div class="flex items-start gap-3">
-                  <div class="flex-1">
-                    <h3 class="text-xl font-bold text-foreground">{{ paciente.nome }}</h3>
-                    <p class="text-sm text-muted-foreground mt-1">CPF: {{ paciente.cpf }} | {{ paciente.idade || '--' }} anos</p>
+      <div class="grid gap-6">
+        <div v-for="paciente in filteredPacientes" :key="paciente.id" class="bg-white rounded-[36px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 p-8 transition-all hover:shadow-md group">
+            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+              
+              <div class="flex items-start gap-5">
+                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-[20px] bg-muted border border-border/50">
+                   <img :src="`https://api.dicebear.com/7.x/notionists/svg?seed=${paciente.nome}&backgroundColor=E8F0FF`" alt="Avatar" class="h-full w-full object-cover" />
+                </div>
+                
+                <div class="space-y-2">
+                  <div class="flex items-center gap-3">
+                    <h3 class="text-[20px] font-bold text-foreground">{{ paciente.nome }}</h3>
+                    <Badge v-if="paciente.necessitatransporte" variant="secondary" class="bg-[#FFECCC] text-[#FF9E00] border-0 font-extrabold uppercase tracking-wide text-[10px] px-3 py-0.5 rounded-full">Necessita Transporte</Badge>
                   </div>
-                  <Badge v-if="paciente.necessitatransporte" variant="secondary" class="bg-secondary/10 text-secondary">Necessita Transporte</Badge>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                  <div><span class="text-muted-foreground">Telefone:</span> <span class="text-foreground font-medium">{{ formatarTelefoneVisual(paciente.telefone) }}</span></div>
-                  <div><span class="text-muted-foreground">Diagnóstico:</span> <span class="text-foreground font-medium">{{ paciente.diagnostico }}</span></div>
-                  <div class="md:col-span-2"><span class="text-muted-foreground">Endereço:</span> <span class="text-foreground font-medium">{{ paciente.endereco }}</span></div>
-                </div>
+                  <p class="text-[14px] font-medium text-muted-foreground">CPF: {{ paciente.cpf }} • {{ paciente.idade || '--' }} anos</p>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 pt-3 text-[14px]">
+                    <div><span class="text-muted-foreground font-medium">Cel:</span> <span class="text-foreground font-bold pl-1">{{ formatarTelefoneVisual(paciente.telefone) }}</span></div>
+                    <div><span class="text-muted-foreground font-medium">Diagnóstico:</span> <span class="text-foreground font-bold pl-1">{{ paciente.diagnostico || 'Não informado' }}</span></div>
+                    <div class="md:col-span-2"><span class="text-muted-foreground font-medium">Endereço:</span> <span class="text-foreground font-bold pl-1">{{ paciente.endereco || 'Não informado' }}</span></div>
+                  </div>
 
-                <div v-if="paciente.alergias && paciente.alergias.length > 0" class="flex flex-wrap gap-2">
-                  <span class="text-sm text-muted-foreground">Alergias:</span>
-                  <Badge v-for="(alergia, index) in paciente.alergias" :key="index" variant="destructive" class="bg-destructive/10 text-destructive">{{ alergia }}</Badge>
-                </div>
-
-                <div v-if="paciente.medicamentoscontrolados && paciente.medicamentoscontrolados.length > 0" class="flex flex-wrap gap-2">
-                  <span class="text-sm text-muted-foreground">Medicamentos:</span>
-                  <Badge v-for="(med, index) in paciente.medicamentoscontrolados" :key="index" variant="outline" class="bg-info/10 text-info border-info/30">{{ med }}</Badge>
+                  <div v-if="(paciente.alergias && paciente.alergias.length > 0) || (paciente.medicamentoscontrolados && paciente.medicamentoscontrolados.length > 0)" class="flex flex-wrap gap-2 pt-3">
+                    <Badge v-for="(alergia, index) in paciente.alergias" :key="'al_'+index" variant="destructive" class="bg-destructive/10 text-destructive border-0 rounded-full font-bold px-3 py-1">Alergia: {{ alergia }}</Badge>
+                    <Badge v-for="(med, index) in paciente.medicamentoscontrolados" :key="'med_'+index" variant="outline" class="bg-primary/10 text-primary border-0 rounded-full font-bold px-3 py-1">{{ med }}</Badge>
+                  </div>
                 </div>
               </div>
 
-              <div class="flex lg:flex-col gap-2">
-                <Button variant="outline" size="icon" class="border-primary text-primary hover:bg-primary hover:text-primary-foreground" @click="openViewDialog(paciente)">
-                  <Eye class="w-4 h-4" />
-                </Button>
-                <Button variant="outline" size="icon" class="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-black" @click="openEditDialog(paciente)">
-                  <Edit class="w-4 h-4" />
-                </Button>
-
-                <Button variant="outline" size="icon" class="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground" @click="abrirAlertaExclusao(paciente.id)">
-                  <Trash2 class="w-4 h-4" />
-                </Button>
+              <div class="flex lg:flex-col gap-3">
+                <button class="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#F4F7FC] text-primary hover:bg-primary hover:text-white transition-colors" @click="openViewDialog(paciente)" title="Visualizar">
+                  <Eye class="w-5 h-5" />
+                </button>
+                <button class="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#F4F7FC] text-[#00C2C7] hover:bg-[#00C2C7] hover:text-white transition-colors" @click="openEditDialog(paciente)" title="Editar">
+                  <Edit class="w-5 h-5" />
+                </button>
+                <button class="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#F4F7FC] text-destructive hover:bg-destructive hover:text-white transition-colors" @click="abrirAlertaExclusao(paciente.id)" title="Deletar">
+                  <Trash2 class="w-5 h-5" />
+                </button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+        </div>
       </div>
 
-      <div v-if="filteredPacientes.length === 0" class="text-center py-12">
-        <p class="text-muted-foreground">
+      <div v-if="filteredPacientes.length === 0" class="flex flex-col items-center justify-center text-center py-16 bg-white rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
+        <div class="h-20 w-20 rounded-[24px] bg-muted/50 flex items-center justify-center mb-6">
+          <Search class="h-8 w-8 text-muted-foreground" />
+        </div>
+        <p class="text-[15px] font-bold text-muted-foreground">
           {{ searchTerm ? `Nenhum paciente encontrado com "${searchTerm}"` : 'Nenhum paciente cadastrado.' }}
         </p>
       </div>

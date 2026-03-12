@@ -1,20 +1,21 @@
 <template>
   <Head title="Profissionais" />
   <Layout>
-    <div class="p-6 space-y-6">
-      <div
-        class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-      >
+    <div class="mx-auto w-full max-w-7xl pb-10">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-foreground">Profissionais</h1>
-          <p class="text-muted-foreground mt-1">
+          <h1 class="text-[32px] font-bold text-foreground tracking-tight">Profissionais</h1>
+          <p class="text-[14px] text-muted-foreground mt-1">
             Gerencie os profissionais voluntários da clínica
           </p>
         </div>
 
         <Dialog v-model:open="isAddEditDialogOpen">
           <DialogTrigger as-child>
-            <Button @click="openAddDialog"><Plus class="w-4 h-4 mr-2" /> Novo Profissional</Button>
+            <Button @click="openAddDialog" class="rounded-full shadow-md shadow-primary/20 px-6 py-6 font-bold text-[14px]">
+              <Plus class="w-5 h-5 mr-2" /> 
+              Novo Profissional
+            </Button>
           </DialogTrigger>
           <DialogContent class="sm:max-w-150 max-h-[90vh] overflow-y-auto">
              <DialogHeader>
@@ -83,76 +84,92 @@
         </Dialog>
       </div>
 
-      <div class="relative">
-        <Search
-          class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"
-        />
-        <Input
-          v-model="searchTerm"
-          placeholder="Buscar por nome ou especialidade..."
-          class="pl-10"
-        />
-      </div>
+      <div class="flex flex-col lg:flex-row gap-8 mb-8">
+        <!-- Search -->
+        <div class="relative w-full max-w-md">
+          <Search class="absolute left-5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"/>
+          <Input v-model="searchTerm" placeholder="Buscar por nome ou especialidade..." class="h-14 w-full rounded-full border-0 bg-white pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium"/>
+        </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> <Card class="bg-primary/5 border-primary/20 dark:bg-blue-500/10 dark:border-blue-500/20">
-              <CardContent class="pt-6">
-                  <div class="text-3xl font-bold text-primary dark:text-blue-400">{{ profissionais.length }}</div>
-                  <p class="text-sm text-muted-foreground mt-1">Total de Profissionais</p>
-              </CardContent>
-          </Card>
-          <Card class="bg-secondary/5 border-secondary/20 dark:bg-emerald-500/10 dark:border-emerald-500/20">
-              <CardContent class="pt-6">
-                  <div class="text-3xl font-bold text-secondary dark:text-emerald-400">{{ totalHoras }}h</div>
-                  <p class="text-sm text-muted-foreground mt-1">Horas Voluntárias este Mês</p>
-              </CardContent>
-          </Card>
+        <!-- Mini Stats -->
+        <div class="flex gap-4"> 
+            <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-3 flex items-center gap-4">
+                <div class="h-8 w-8 rounded-full bg-[#E8F0FF] flex items-center justify-center">
+                   <span class="text-primary font-bold">{{ profissionais.length }}</span>
+                </div>
+                <span class="text-sm font-bold text-muted-foreground">Profissionais</span>
+            </div>
+            <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-3 flex items-center gap-4">
+                <div class="h-8 w-8 rounded-full bg-[#E0F8FC] flex items-center justify-center">
+                   <span class="text-[#00C2C7] font-bold text-xs">{{ totalHoras }}h</span>
+                </div>
+                <span class="text-sm font-bold text-muted-foreground">Horas Voluntárias</span>
+            </div>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card
-          v-for="prof in filteredProfissionais"
-          :key="prof.id"
-          class="hover:shadow-lg transition-shadow"
-        >
-           <CardHeader>
-             <div class="flex items-start gap-4">
-               <Avatar class="w-16 h-16 bg-primary text-primary-foreground text-xl"> <AvatarFallback>{{ getInitials(prof.nome) }}</AvatarFallback> </Avatar>
-               <div class="flex-1">
-                 <CardTitle class="text-xl">{{ prof.nome }}</CardTitle>
-                 <p class="text-sm text-muted-foreground mt-1">{{ prof.especialidade }}</p>
-                 <p class="text-xs text-muted-foreground mt-1">Reg: {{ prof.crm }} | ID Interno: {{ prof.registro_interno }}</p> 
+        <div v-for="prof in filteredProfissionais" :key="prof.id" class="bg-white rounded-[36px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 p-8 transition-all hover:shadow-md group flex flex-col">
+           <div class="flex items-start gap-5 mb-6">
+             <div class="h-16 w-16 shrink-0 overflow-hidden rounded-[20px] bg-muted border border-border/50">
+               <img :src="`https://api.dicebear.com/7.x/notionists/svg?seed=${prof.nome}&backgroundColor=E8F0FF`" alt="Avatar" class="h-full w-full object-cover" />
+             </div>
+             <div class="flex-1">
+               <div class="flex items-center justify-between">
+                 <h3 class="text-[20px] font-bold text-foreground">{{ prof.nome }}</h3>
+                 <Badge variant="outline" class="bg-[#E0F8FC] text-[#00C2C7] border-0 font-extrabold uppercase tracking-wide text-[10px] px-3 py-0.5 rounded-full"> {{ prof.status || 'Ativo' }} </Badge>
                </div>
-               <Badge variant="outline" class="bg-success/10 text-success border-success/30"> {{ prof.status || 'ativo' }} </Badge>
+               <p class="text-[14px] font-medium text-primary mt-0.5">{{ prof.especialidade }}</p>
+               <p class="text-[12px] font-bold text-muted-foreground mt-1 tracking-wide">CRM: {{ prof.crm }} &bull; ID: {{ prof.registro_interno }}</p> 
              </div>
-           </CardHeader>
-           <CardContent class="space-y-4">
-             <div class="grid grid-cols-2 gap-3 text-sm">
-               <div> <p class="text-muted-foreground">Telefone</p> <p class="font-medium text-foreground">{{ formatarTelefoneVisual(prof.telefone) }}</p> </div>
-               <div> <p class="text-muted-foreground">Email</p> <p class="font-medium text-foreground truncate">{{ prof.email }}</p> </div>
+           </div>
+
+           <div class="space-y-4 mb-6 flex-1">
+             <div class="grid grid-cols-2 gap-3 text-[14px]">
+               <div><p class="text-muted-foreground font-medium">Celular</p><p class="font-bold text-foreground">{{ formatarTelefoneVisual(prof.telefone) }}</p></div>
+               <div><p class="text-muted-foreground font-medium">Email</p><p class="font-bold text-foreground truncate">{{ prof.email }}</p></div>
              </div>
-             <div class="space-y-2">
-               <div class="flex items-center gap-2 text-sm"> <Calendar class="w-4 h-4 text-primary" /> <span class="text-muted-foreground">Disponibilidade:</span> </div>
-               <div class="flex flex-wrap gap-2"> <Badge v-for="(dia, index) in prof.disponibilidade" :key="index" variant="outline" class="bg-primary/10 text-primary border-primary/30">{{ dia }}</Badge> </div>
+             
+             <div class="bg-[#F4F7FC] rounded-[20px] p-4 space-y-3">
+               <div class="flex items-center gap-2 text-[14px]"> 
+                 <Calendar class="w-4 h-4 text-primary" /> 
+                 <span class="font-bold text-foreground text-[13px] uppercase tracking-wider">Disponibilidade</span> 
+               </div>
+               <div class="flex flex-wrap gap-2"> 
+                 <Badge v-for="(dia, index) in prof.disponibilidade" :key="index" variant="outline" class="bg-white text-muted-foreground border-border/50 rounded-full font-bold px-3 py-1 shadow-sm">{{ dia }}</Badge> 
+               </div>
+               <div class="flex items-center gap-2 text-[14px] mt-2"> 
+                 <Clock class="w-4 h-4 text-[#A033FF]" /> 
+                 <span class="font-bold text-foreground">{{ prof.horarios }}</span> 
+               </div>
              </div>
-             <div class="flex items-center gap-2 text-sm"> <Clock class="w-4 h-4 text-secondary" /> <span class="text-muted-foreground">Horários:</span> <span class="font-medium text-foreground">{{ prof.horarios }}</span> </div>
-             <div class="pt-3 border-t border-border">
-               <div class="flex items-center justify-between"> <span class="text-sm text-muted-foreground"> Horas Voluntárias </span> <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-400"> {{ prof.horasvoluntarias || 0 }}h </span> </div>
-             </div>
-           </CardContent>
-           <CardFooter class="flex justify-end gap-2 p-4 pt-0">
-              <Button variant="outline" size="icon" class="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-black" @click="openEditDialog(prof)">
-                <Edit class="w-4 h-4" />
-              </Button>
+           </div>
+
+           <div class="flex items-center justify-between pt-4 border-t border-border/40">
+              <div class="flex items-center gap-3"> 
+                <div class="h-10 w-10 rounded-full bg-[#E0F8FC] flex items-center justify-center">
+                  <span class="text-[14px] font-extrabold text-[#00C2C7]">{{ prof.horasvoluntarias || 0 }}h</span>
+                </div>
+                <span class="text-[12px] font-bold text-muted-foreground tracking-wide uppercase">Voluntariado</span> 
+              </div>
               
-              <Button variant="outline" size="icon" class="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground" @click="abrirAlertaExclusao(prof.id)">
-                <Trash2 class="w-4 h-4" />
-              </Button>
-           </CardFooter>
-        </Card>
+              <div class="flex gap-2">
+                <button class="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#F4F7FC] text-[#00C2C7] hover:bg-[#00C2C7] hover:text-white transition-colors" @click="openEditDialog(prof)" title="Editar">
+                  <Edit class="w-4 h-4" />
+                </button>
+                <button class="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#F4F7FC] text-destructive hover:bg-destructive hover:text-white transition-colors" @click="abrirAlertaExclusao(prof.id)" title="Deletar">
+                  <Trash2 class="w-4 h-4" />
+                </button>
+              </div>
+           </div>
+        </div>
       </div>
 
-      <div v-if="filteredProfissionais.length === 0" class="text-center py-12">
-        <p class="text-muted-foreground">
+      <div v-if="filteredProfissionais.length === 0" class="flex flex-col items-center justify-center text-center py-16 bg-white rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
+        <div class="h-20 w-20 rounded-[24px] bg-muted/50 flex items-center justify-center mb-6">
+          <Search class="h-8 w-8 text-muted-foreground" />
+        </div>
+        <p class="text-[15px] font-bold text-muted-foreground">
            {{ searchTerm ? `Nenhum profissional encontrado com "${searchTerm}"` : 'Nenhum profissional cadastrado.' }}
         </p>
       </div>

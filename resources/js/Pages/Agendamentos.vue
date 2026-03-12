@@ -1,54 +1,67 @@
 <template>
   <Head title="Agendamentos" />
   <Layout>
-    <div class="p-6 space-y-6">
-      <div
-        class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-      >
+    <div class="mx-auto w-full max-w-7xl pb-10">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-foreground">Agendamentos</h1>
-          <p class="text-muted-foreground mt-1">
+          <h1 class="text-[32px] font-bold text-foreground tracking-tight">Agendamentos</h1>
+          <p class="text-[14px] text-muted-foreground mt-1">
             Gerencie os agendamentos e histórico da clínica
           </p>
         </div>
         
-        <Button @click="openAddDialog">
-          <Plus class="w-4 h-4 mr-2" />
-          Novo Agendamento
-        </Button>
+        <Dialog v-model:open="isAddEditDialogOpen">
+          <DialogTrigger as-child>
+            <Button @click="openAddDialog" class="rounded-full shadow-md shadow-primary/20 px-6 py-6 font-bold text-[14px]">
+              <Plus class="w-5 h-5 mr-2" />
+              Novo Agendamento
+            </Button>
+          </DialogTrigger>
+        </Dialog>
       </div>
 
       <Tabs default-value="proximos" class="w-full">
-        <TabsList>
-          <TabsTrigger value="proximos">Próximos</TabsTrigger>
-          <TabsTrigger value="historico">Histórico & Concluídos</TabsTrigger>
+        <TabsList class="mb-6 bg-white rounded-full p-1.5 h-16 w-full max-w-[600px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20">
+          <TabsTrigger value="proximos" class="rounded-full data-[state=active]:bg-[#F4F7FC] data-[state=active]:text-primary data-[state=active]:shadow-none h-full w-1/2 text-[15px] font-bold transition-all">Próximos</TabsTrigger>
+          <TabsTrigger value="historico" class="rounded-full data-[state=active]:bg-[#F4F7FC] data-[state=active]:text-primary data-[state=active]:shadow-none h-full w-1/2 text-[15px] font-bold transition-all">Histórico & Concluídos</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="proximos" class="space-y-6 mt-6">
+        <TabsContent value="proximos" class="space-y-6 mt-6 outline-hidden focus:ring-0">
           
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card class="bg-primary/5 border-primary/20 dark:bg-blue-500/10 dark:border-blue-500/20">
-                <CardContent class="pt-6">
-                    <div class="text-3xl font-bold text-primary dark:text-blue-400">{{ upcoming.length }}</div>
-                    <p class="text-sm text-muted-foreground mt-1">Próximas Consultas</p>
-                </CardContent>
-            </Card>
-            <Card class="bg-secondary/5 border-secondary/20 dark:bg-emerald-500/10 dark:border-emerald-500/20">
-                <CardContent class="pt-6">
-                    <div class="text-3xl font-bold text-secondary dark:text-emerald-400">{{ upcomingConfirmedCount }}</div>
-                    <p class="text-sm text-muted-foreground mt-1">Confirmadas</p>
-                </CardContent>
-            </Card>
-            <Card class="bg-warning/5 border-warning/20 dark:bg-amber-500/10 dark:border-amber-500/20">
-                <CardContent class="pt-6">
-                    <div class="text-3xl font-bold text-warning dark:text-amber-400">{{ upcomingAguardandoCount }}</div>
-                    <p class="text-sm text-muted-foreground mt-1">Aguardando</p>
-                </CardContent>
-            </Card>
+          <div class="flex flex-col md:flex-row gap-4 mb-8"> 
+            <div class="bg-white rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-4 flex items-center gap-5 flex-1 hover:shadow-md transition-all">
+                <div class="h-14 w-14 rounded-[20px] bg-[#E8F0FF] flex items-center justify-center">
+                   <CalendarIcon class="w-6 h-6 text-primary" />
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[12px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">Agendados</span>
+                  <span class="text-[28px] font-extrabold text-foreground leading-none">{{ upcoming.length }}</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-4 flex items-center gap-5 flex-1 hover:shadow-md transition-all">
+                <div class="h-14 w-14 rounded-[20px] bg-[#E0F8FC] flex items-center justify-center">
+                   <CheckCircle class="w-6 h-6 text-[#00C2C7]" />
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[12px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">Confirmados</span>
+                  <span class="text-[28px] font-extrabold text-foreground leading-none">{{ upcomingConfirmedCount }}</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-4 flex items-center gap-5 flex-1 hover:shadow-md transition-all">
+                <div class="h-14 w-14 rounded-[20px] bg-[#FFECCC] flex items-center justify-center">
+                   <Clock class="w-6 h-6 text-[#FF9E00]" />
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-[12px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">Aguardando</span>
+                  <span class="text-[28px] font-extrabold text-foreground leading-none">{{ upcomingAguardandoCount }}</span>
+                </div>
+            </div>
           </div>
 
-          <div class="space-y-4">
-            <h2 class="text-xl font-semibold text-foreground">Próximos Agendamentos</h2>
+          <div class="space-y-6">
+            <h2 class="text-[20px] font-bold text-foreground">Próximos Agendamentos</h2>
             <template v-if="upcoming.length > 0">
               <AgendamentoCard
                 v-for="agendamento in upcoming"
@@ -59,65 +72,70 @@
               />
             </template>
             <template v-else>
-              <Card>
-                <CardContent class="py-12 text-center">
-                  <CalendarIcon class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p class="text-muted-foreground"> Nenhuma consulta futura agendada. </p>
-                </CardContent>
-              </Card>
+              <div class="flex flex-col items-center justify-center text-center py-16 bg-white rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
+                <div class="h-20 w-20 rounded-[24px] bg-[#F4F7FC] flex items-center justify-center mb-6">
+                  <CalendarIcon class="h-8 w-8 text-primary" />
+                </div>
+                <p class="text-[16px] font-bold text-muted-foreground">Nenhuma consulta futura agendada.</p>
+              </div>
             </template>
           </div>
         </TabsContent>
 
-        <TabsContent value="historico" class="space-y-6 mt-6">
-          <div class="flex flex-col md:flex-row items-start md:items-center gap-4 bg-muted/30 p-4 rounded-lg border">
+        <TabsContent value="historico" class="space-y-6 mt-6 outline-hidden focus:ring-0">
+          <div class="flex flex-col md:flex-row items-center gap-4 bg-white rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 p-4 mb-8">
             
-  <div class="flex items-center gap-2">
-              <span class="text-sm font-medium">Data:</span>
-              <Popover>
-                 <PopoverTrigger as-child>
-                   <Button
-                     variant="outline"
-                     :class="['w-65 justify-start text-left font-normal', !historyDateValue && 'text-muted-foreground']"
-                   >
-                     <CalendarIcon class="mr-2 h-4 w-4 shrink-0" /> {{ historyDateValue ? formatDateDisplay(historyDateValue) : "Todas as datas" }}
-                   </Button>
-                 </PopoverTrigger>
-                 <PopoverContent class="w-auto p-0">
-                   <Calendar 
-                      v-model="historyDateValue" 
-                      mode="single" 
-                      locale="pt-BR" 
-                   />
-                 </PopoverContent>
-               </Popover>
-               
-               <Button v-if="historyDateValue" variant="ghost" size="icon" @click="historyDateValue = undefined" title="Limpar data">
-                 <span class="text-xs">✕</span>
-               </Button>
-            </div>
+             <div class="flex items-center gap-3 w-full md:w-auto">
+               <div class="h-12 w-12 flex shrink-0 items-center justify-center bg-[#F4F7FC] rounded-[16px]">
+                 <CalendarIcon class="w-5 h-5 text-primary" />
+               </div>
+               <Popover>
+                  <PopoverTrigger as-child>
+                    <Button
+                      variant="outline"
+                      :class="['w-full md:w-65 justify-start text-left font-bold rounded-[16px] h-12 border-0 bg-[#F4F7FC] text-[14px] shadow-none hover:bg-[#E8F0FF] hover:text-primary transition-colors', !historyDateValue && 'text-muted-foreground']"
+                    >
+                      {{ historyDateValue ? formatDateDisplay(historyDateValue) : "Filtrar por data" }}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent class="w-auto p-0 rounded-[24px] border-0 shadow-xl overflow-hidden">
+                    <Calendar 
+                       v-model="historyDateValue" 
+                       mode="single" 
+                       locale="pt-BR" 
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                <Button v-if="historyDateValue" variant="ghost" class="h-12 w-12 shrink-0 rounded-[14px] text-destructive hover:bg-destructive/10 hover:text-destructive" @click="historyDateValue = undefined" title="Limpar data">
+                  <X class="w-5 h-5" />
+                </Button>
+             </div>
 
-            <div class="flex items-center gap-2 w-full md:w-auto">
-              <span class="text-sm font-medium">Profissional:</span>
-              <Select v-model="historyProfessionalFilter">
-                <SelectTrigger class="w-50">
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem v-for="prof in profissionais" :key="prof.id" :value="prof.nome">
-                      {{ prof.nome }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+             <div class="h-8 w-[1px] bg-border/50 hidden md:block mx-1"></div>
 
+             <div class="flex items-center gap-3 w-full md:w-auto flex-1 max-w-[400px]">
+               <div class="h-12 w-12 flex shrink-0 items-center justify-center bg-[#F4F7FC] rounded-[16px]">
+                 <User class="w-5 h-5 text-primary" />
+               </div>
+               <Select v-model="historyProfessionalFilter">
+                 <SelectTrigger class="w-full rounded-[16px] h-12 border-0 bg-[#F4F7FC] font-bold text-[14px] shadow-none focus:ring-primary focus:ring-2">
+                   <SelectValue placeholder="Filtrar por profissional" />
+                 </SelectTrigger>
+                 <SelectContent class="rounded-[20px] shadow-xl border border-border/50">
+                   <SelectGroup>
+                     <SelectItem value="all" class="rounded-[12px] font-bold">Todos os profissionais</SelectItem>
+                     <SelectItem v-for="prof in profissionais" :key="prof.id" :value="prof.nome" class="rounded-[12px] font-bold">
+                       {{ prof.nome }}
+                     </SelectItem>
+                   </SelectGroup>
+                 </SelectContent>
+               </Select>
+             </div>
           </div>
 
-          <div class="space-y-4">
-            <h2 class="text-xl font-semibold text-foreground">Histórico de Consultas</h2>
+          <div class="space-y-6">
+            <h2 class="text-[20px] font-bold text-foreground">Histórico de Consultas</h2>
             <template v-if="historyFiltered.length > 0">
               <AgendamentoCard
                 v-for="agendamento in historyFiltered"
@@ -128,7 +146,12 @@
               />
             </template>
             <template v-else>
-              <p class="text-center text-muted-foreground py-8">Nenhum histórico encontrado para esta seleção.</p>
+              <div class="flex flex-col items-center justify-center text-center py-16 bg-white rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
+                <div class="h-20 w-20 rounded-[24px] bg-[#F4F7FC] flex items-center justify-center mb-6">
+                  <Search class="h-8 w-8 text-muted-foreground" />
+                </div>
+                <p class="text-[16px] font-bold text-muted-foreground">Nenhum histórico encontrado para esta seleção.</p>
+              </div>
             </template>
           </div>
         </TabsContent>

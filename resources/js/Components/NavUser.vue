@@ -23,6 +23,10 @@ const props = defineProps({
     type: Object,
     required: false,
     default: () => ({ name: 'Carregando...', email: '' })
+  },
+  isCollapsed: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -56,12 +60,20 @@ const confirmLogout = async () => {
 <template>
   <DropdownMenu>
     <DropdownMenuTrigger as-child>
+      <button
+        v-if="isCollapsed"
+        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 overflow-hidden hover:ring-primary/50 transition-all focus:outline-hidden"
+      >
+        <img class="h-full w-full object-cover" :src="`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.name || 'User'}&backgroundColor=E8F0FF`" alt="Avatar" />
+      </button>
+
       <Button
+        v-else
         variant="outline" 
         class="w-full justify-start h-auto py-3 px-3 border-muted-foreground/20 hover:bg-accent hover:text-accent-foreground"
       >
-        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted border border-border text-foreground">
-           <User class="h-5 w-5" />
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted border border-border text-foreground overflow-hidden">
+           <img class="h-full w-full object-cover" :src="`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.name || 'User'}&backgroundColor=E8F0FF`" alt="Avatar" />
         </div>
 
         <div class="grid flex-1 text-left text-sm leading-tight ml-3">

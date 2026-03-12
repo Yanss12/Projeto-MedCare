@@ -1,17 +1,17 @@
 <template>
   <Head title="Prontuários" />
   <Layout>
-    <div class="p-6 space-y-6">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="mx-auto w-full max-w-7xl pb-10">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-foreground">Prontuários e Anamnese</h1>
-          <p class="text-muted-foreground mt-1">Acompanhe a evolução clínica dos pacientes</p>
+          <h1 class="text-[32px] font-bold text-foreground tracking-tight">Prontuários e Anamnese</h1>
+          <p class="text-[14px] text-muted-foreground mt-1">Acompanhe a evolução clínica dos pacientes</p>
         </div>
         
         <Dialog v-model:open="isEvolucaoDialogOpen">
           <DialogTrigger as-child>
-            <Button @click="openDialogAndReset">
-              <Plus class="w-4 h-4 mr-2" />
+            <Button @click="openDialogAndReset" class="rounded-full shadow-md shadow-primary/20 px-6 py-6 font-bold text-[14px]">
+              <Plus class="w-5 h-5 mr-2" />
               Nova Evolução
             </Button>
           </DialogTrigger>
@@ -66,12 +66,12 @@
         </Dialog>
       </div>
 
-      <div class="relative">
-        <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"/>
-        <Input v-model="searchTerm" placeholder="Buscar prontuário por nome do paciente..." class="pl-10"/>
+      <div class="relative w-full max-w-md mb-8">
+        <Search class="absolute left-5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"/>
+        <Input v-model="searchTerm" placeholder="Buscar prontuário por paciente..." class="h-14 w-full rounded-full border-0 bg-white pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium"/>
       </div>
 
-      <div class="space-y-6">
+      <div class="space-y-8">
         <ProntuarioCard
           v-for="prontuario in filteredProntuarios"
           :key="prontuario.id"
@@ -80,8 +80,11 @@
         />
       </div>
 
-      <div v-if="filteredProntuarios.length === 0" class="text-center py-12">
-        <p class="text-muted-foreground">
+      <div v-if="filteredProntuarios.length === 0" class="flex flex-col items-center justify-center text-center py-16 bg-white rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
+        <div class="h-20 w-20 rounded-[24px] bg-[#F4F7FC] flex items-center justify-center mb-6">
+          <Search class="h-8 w-8 text-muted-foreground" />
+        </div>
+        <p class="text-[16px] font-bold text-muted-foreground">
           {{ searchTerm ? `Nenhum prontuário encontrado com "${searchTerm}"` : 'Nenhum prontuário encontrado.' }}
         </p>
       </div>
