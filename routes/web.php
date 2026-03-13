@@ -2,6 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\ProfissionalController;
+use App\Http\Controllers\AgendamentoController;
+use App\Http\Controllers\ProntuarioController;
+use App\Http\Controllers\EvolucaoController;
 
 // Rota de Login (Pública)
 Route::get('/login', function () {
@@ -33,72 +39,14 @@ Route::post('/logout', function (Illuminate\Http\Request $request) {
 
 // Rotas Protegidas (Requer Autenticação)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', function () {
-        $hoje = now()->format('Y-m-d');
-        
-        $totalPacientes = \App\Models\Paciente::count();
-        $totalProfissionais = \App\Models\Profissional::count();
-        $agendamentosHoje = \App\Models\Agendamento::with(['paciente', 'profissional'])
-            ->whereDate('data_hora', $hoje)
-            ->orderBy('data_hora', 'asc')
-            ->get()
-            ->map(function ($ag) {
-                return [
-                    'id' => $ag->id,
-                    'paciente' => $ag->paciente->nome ?? 'Desconhecido',
-                    'profissional' => $ag->profissional->nome ?? 'Desconhecido',
-                    'especialidade' => $ag->profissional->especialidade ?? '',
-                    'horario' => \Carbon\Carbon::parse($ag->data_hora)->format('H:i'),
-                    'status' => $ag->status
-                ];
-            });
+    
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-        return Inertia::render('Dashboard', [
-            'totalPacientes' => $totalPacientes,
-            'totalProfissionais' => $totalProfissionais,
-            'consultasHoje' => $agendamentosHoje
-        ]);
-    })->name('dashboard');
+    // Módulos
+    Route::resource('pacientes', PacienteController::class);
+    Route::resource('profissionais', ProfissionalController::class);
+    Route::resource('agendamentos', AgendamentoController::class);
+    Route::resource('prontuarios', ProntuarioController::class);
+    Route::resource('evolucoes', EvolucaoController::class);
 
-    Route::get('/pacientes', function () {
-        $pacientes = \App\Models\Paciente::orderBy('nome')->get();
-        return Inertia::render('Pacientes', [
-            'pacientes' => $pacientes
-        ]);
-    })->name('pacientes');
-
-    Route::get('/profissionais', function () {
-        $profissionais = \App\Models\Profissional::orderBy('nome')->get();
-        return Inertia::render('Profissionais', [
-            'profissionais' => $profissionais
-        ]);
-    })->name('profissionais');
-
-    Route::get('/agendamentos', function () {
-        $agendamentos = \App\Models\Agendamento::all();
-        $pacientes = \App\Models\Paciente::orderBy('nome')->get();
-        $profissionais = \App\Models\Profissional::orderBy('nome')->get();
-
-        return Inertia::render('Agendamentos', [
-            'agendamentos' => $agendamentos,
-            'pacientes' => $pacientes,
-            'profissionais' => $profissionais
-        ]);
-    })->name('agendamentos');
-
-    Route::get('/prontuarios', function () {
-        $pacientes = \App\Models\Paciente::with(['evolucoes' => function($query) {
-            $query->orderBy('data_registro', 'desc');
-        }])->orderBy('nome')->get();
-        
-        $profissionais = \App\Models\Profissional::orderBy('nome')->get();
-
-        return Inertia::render('Prontuarios', [
-            'prontuarios' => $pacientes,
-            'profissionais' => $profissionais
-        ]);
-    })->name('prontuarios');
 });
-
-// A rota coringa NotFound (404) será gerenciada automaticamente no front via Vue, 
-// ou usando renderização de erro custom do Laravel/Inertia.

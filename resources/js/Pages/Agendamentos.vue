@@ -10,13 +10,110 @@
           </p>
         </div>
         
-        <Dialog v-model:open="isAddEditDialogOpen">
+        <Dialog v-model:open="isDialogOpen">
           <DialogTrigger as-child>
             <Button @click="openAddDialog" class="rounded-full shadow-md shadow-primary/20 px-6 py-6 font-bold text-[14px]">
               <Plus class="w-5 h-5 mr-2" />
               Novo Agendamento
             </Button>
           </DialogTrigger>
+          <DialogContent class="sm:max-w-125">
+             <DialogHeader>
+               <DialogTitle>{{ isEditing ? 'Reagendar Consulta' : 'Novo Agendamento' }}</DialogTitle>
+               <DialogDescription>
+                 Selecione o paciente, profissional e data/hora da consulta.
+               </DialogDescription>
+             </DialogHeader>
+             
+             <div class="grid gap-4 py-4">
+               <div class="grid grid-cols-4 items-center gap-4">
+                 <Label for="ag-paciente" class="text-right"> Paciente </Label>
+                 <Select v-model="form.paciente" class="col-span-3">
+                   <SelectTrigger>
+                     <SelectValue placeholder="Selecione um paciente" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectGroup>
+                       <SelectItem v-for="paciente in pacientes" :key="paciente.id" :value="paciente.id.toString()">
+                         {{ paciente.nome }}
+                       </SelectItem>
+                     </SelectGroup>
+                   </SelectContent>
+                 </Select>
+               </div>
+
+               <div class="grid grid-cols-4 items-start gap-4">
+                 <Label for="ag-profissional" class="text-right pt-3"> Profissional </Label>
+                 <div class="col-span-3 space-y-2">
+                    <Select v-model="form.profissional">
+                     <SelectTrigger>
+                       <SelectValue placeholder="Selecione um profissional" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       <SelectGroup>
+                         <SelectItem v-for="prof in profissionais" :key="prof.id" :value="prof.id.toString()">
+                           {{ prof.nome }} - {{ prof.especialidade }}
+                         </SelectItem>
+                       </SelectGroup>
+                     </SelectContent>
+                   </Select>
+                   
+                   <div v-if="profissionalSelecionadoObj" class="text-xs text-muted-foreground bg-muted p-2 rounded border">
+                      <p><strong>Atende:</strong> {{ profissionalSelecionadoObj.disponibilidade?.join(', ') || 'N/A' }}</p>
+                      <p><strong>Horário:</strong> {{ profissionalSelecionadoObj.horarios || 'N/A' }}</p>
+                   </div>
+                 </div>
+               </div>
+
+               <div class="grid grid-cols-4 items-center gap-4">
+                 <Label class="text-right"> Data </Label>
+                 <Popover>
+                   <PopoverTrigger as-child>
+                     <Button
+                       variant="outline"
+                       :class="['col-span-3 justify-start text-left font-normal', !dateValue && 'text-muted-foreground']"
+                     >
+                       <CalendarIcon class="mr-2 h-4 w-4" />
+                       {{ dateValue ? formatDateDisplay(dateValue) : "Selecione uma data" }}
+                     </Button>
+                   </PopoverTrigger>
+                   <PopoverContent class="w-auto p-0">
+                     <Calendar 
+                        v-model="dateValue" 
+                        mode="single" 
+                        locale="pt-BR" 
+                     />
+                   </PopoverContent>
+                 </Popover>
+               </div>
+
+                <div class="grid grid-cols-4 items-center gap-4">
+                 <Label for="ag-horario" class="text-right"> Horário </Label>
+                 <Input id="ag-horario" v-model="form.horario" type="time" class="col-span-3"/>
+               </div>
+
+                <div class="grid grid-cols-4 items-center gap-4">
+                 <Label for="ag-status" class="text-right"> Status </Label>
+                  <Select v-model="form.status" class="col-span-3">
+                   <SelectTrigger><SelectValue placeholder="Selecione um status" /></SelectTrigger>
+                   <SelectContent>
+                     <SelectGroup>
+                       <SelectItem value="aguardando">Aguardando</SelectItem>
+                       <SelectItem value="confirmado">Confirmado</SelectItem>
+                       <SelectItem value="concluida">Concluída</SelectItem>
+                       <SelectItem value="cancelado">Cancelado</SelectItem>
+                     </SelectGroup>
+                   </SelectContent>
+                 </Select>
+               </div>
+             </div>
+             <DialogFooter>
+               <Button type="button" variant="secondary" @click="isDialogOpen = false">
+                 Cancelar
+               </Button>
+               <Button type="button" @click="saveAgendamento" :disabled="form.processing"> Salvar Agendamento </Button>
+             </DialogFooter>
+           </DialogContent>
         </Dialog>
       </div>
 
@@ -157,105 +254,7 @@
         </TabsContent>
       </Tabs>
 
-      <Dialog v-model:open="isDialogOpen">
-          <DialogContent class="sm:max-w-125">
-             <DialogHeader>
-               <DialogTitle>{{ isEditing ? 'Reagendar Consulta' : 'Novo Agendamento' }}</DialogTitle>
-               <DialogDescription>
-                 Selecione o paciente, profissional e data/hora da consulta.
-               </DialogDescription>
-             </DialogHeader>
-             
-             <div class="grid gap-4 py-4">
-               <div class="grid grid-cols-4 items-center gap-4">
-                 <Label for="ag-paciente" class="text-right"> Paciente </Label>
-                 <Select v-model="form.paciente" class="col-span-3">
-                   <SelectTrigger>
-                     <SelectValue placeholder="Selecione um paciente" />
-                   </SelectTrigger>
-                   <SelectContent>
-                     <SelectGroup>
-                       <SelectItem v-for="paciente in pacientes" :key="paciente.id" :value="paciente.id.toString()">
-                         {{ paciente.nome }}
-                       </SelectItem>
-                     </SelectGroup>
-                   </SelectContent>
-                 </Select>
-               </div>
 
-               <div class="grid grid-cols-4 items-start gap-4">
-                 <Label for="ag-profissional" class="text-right pt-3"> Profissional </Label>
-                 <div class="col-span-3 space-y-2">
-                    <Select v-model="form.profissional">
-                     <SelectTrigger>
-                       <SelectValue placeholder="Selecione um profissional" />
-                     </SelectTrigger>
-                     <SelectContent>
-                       <SelectGroup>
-                         <SelectItem v-for="prof in profissionais" :key="prof.id" :value="prof.id.toString()">
-                           {{ prof.nome }} - {{ prof.especialidade }}
-                         </SelectItem>
-                       </SelectGroup>
-                     </SelectContent>
-                   </Select>
-                   
-                   <div v-if="profissionalSelecionadoObj" class="text-xs text-muted-foreground bg-muted p-2 rounded border">
-                      <p><strong>Atende:</strong> {{ profissionalSelecionadoObj.disponibilidade?.join(', ') || 'N/A' }}</p>
-                      <p><strong>Horário:</strong> {{ profissionalSelecionadoObj.horarios || 'N/A' }}</p>
-                   </div>
-                 </div>
-               </div>
-
-               <div class="grid grid-cols-4 items-center gap-4">
-                 <Label class="text-right"> Data </Label>
-                 <Popover>
-                   <PopoverTrigger as-child>
-                     <Button
-                       variant="outline"
-                       :class="['col-span-3 justify-start text-left font-normal', !dateValue && 'text-muted-foreground']"
-                     >
-                       <CalendarIcon class="mr-2 h-4 w-4" />
-                       {{ dateValue ? formatDateDisplay(dateValue) : "Selecione uma data" }}
-                     </Button>
-                   </PopoverTrigger>
-                   <PopoverContent class="w-auto p-0">
-                     <Calendar 
-                        v-model="dateValue" 
-                        mode="single" 
-                        locale="pt-BR" 
-                     />
-                   </PopoverContent>
-                 </Popover>
-               </div>
-
-                <div class="grid grid-cols-4 items-center gap-4">
-                 <Label for="ag-horario" class="text-right"> Horário </Label>
-                 <Input id="ag-horario" v-model="form.horario" type="time" class="col-span-3"/>
-               </div>
-
-                <div class="grid grid-cols-4 items-center gap-4">
-                 <Label for="ag-status" class="text-right"> Status </Label>
-                  <Select v-model="form.status" class="col-span-3">
-                   <SelectTrigger><SelectValue placeholder="Selecione um status" /></SelectTrigger>
-                   <SelectContent>
-                     <SelectGroup>
-                       <SelectItem value="aguardando">Aguardando</SelectItem>
-                       <SelectItem value="confirmado">Confirmado</SelectItem>
-                       <SelectItem value="concluida">Concluída</SelectItem>
-                       <SelectItem value="cancelado">Cancelado</SelectItem>
-                     </SelectGroup>
-                   </SelectContent>
-                 </Select>
-               </div>
-             </div>
-             <DialogFooter>
-               <Button type="button" variant="secondary" @click="isDialogOpen = false">
-                 Cancelar
-               </Button>
-               <Button type="button" @click="saveAgendamento" :disabled="form.processing"> Salvar Agendamento </Button>
-             </DialogFooter>
-           </DialogContent>
-      </Dialog>
 
       <AlertDialog v-model:open="isAlertOpen">
         <AlertDialogContent>
@@ -282,7 +281,7 @@
 import { ref, computed, watch } from 'vue';
 import { useForm, router, Head } from '@inertiajs/vue3';
 import Layout from '@/Components/Layout.vue';
-import { Plus, Calendar as CalendarIcon } from 'lucide-vue-next';
+import { Plus, Calendar as CalendarIcon, CheckCircle, Clock, X, User, Search } from 'lucide-vue-next';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import AgendamentoCard from '@/Components/AgendamentoCard.vue';
@@ -321,7 +320,7 @@ const historyProfessionalFilter = ref('all');
 const form = useForm({
   paciente: null, 
   profissional: null, 
-  data: '',
+  dataAgendamento: '',
   horario: '',
   status: 'aguardando'
 });
@@ -338,8 +337,8 @@ const formatDateDisplay = (val) => {
 };
 
 watch(dateValue, (newVal) => {
-  if (newVal) form.data = newVal.toString();
-  else form.data = '';
+  if (newVal) form.dataAgendamento = newVal.toString();
+  else form.dataAgendamento = '';
 });
 
 // A lógica de `verificarConclusaoAutomatica` agora deve idealmente ficar no Controller do Laravel.
@@ -366,11 +365,14 @@ const agendamentosFormatados = computed(() => {
     });
 });
 
-// --- FILTROS E COMPUTEDS ---
+// Helper: retorna a data LOCAL no formato YYYY-MM-DD (toISOString usa UTC e quebra filtros)
+const dataLocalStr = (d) => {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
 
 const upcoming = computed(() => {
   const agora = new Date();
-  const dataHojeStr = agora.toISOString().split('T')[0];
+  const dataHojeStr = dataLocalStr(agora);
   const horaAgoraStr = agora.toTimeString().slice(0, 5);
 
   return agendamentosFormatados.value
@@ -390,7 +392,7 @@ const historyFiltered = computed(() => {
     lista = lista.filter(a => a.data === dataFiltro);
   } else {
     const agora = new Date();
-    const dataHojeStr = agora.toISOString().split('T')[0];
+    const dataHojeStr = dataLocalStr(agora);
     const horaAgoraStr = agora.toTimeString().slice(0, 5);
 
     lista = lista.filter(a => {
@@ -416,29 +418,34 @@ const upcomingAguardandoCount = computed(() => upcoming.value.filter(a => a.stat
 const validarAgendamento = () => {
   if (!profissionalSelecionadoObj.value) return true;
   const prof = profissionalSelecionadoObj.value;
-  const dataSelecionada = new Date(form.data + 'T00:00:00'); 
-  const diaSemana = dataSelecionada.toLocaleDateString('pt-BR', { weekday: 'long' });
+
+  // Se o profissional não tem disponibilidade cadastrada, libera
   const diasDisponiveis = prof.disponibilidade || [];
-  const diaSemanaSimples = diaSemana.split('-')[0].toLowerCase(); 
-  const removerAcentos = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const atendeNoDia = diasDisponiveis.some(d => removerAcentos(d.toLowerCase()).includes(removerAcentos(diaSemanaSimples)));
-  if (!atendeNoDia) { addToast(`Profissional não atende ${diaSemana}.`, 'warning'); return false; }
+  if (diasDisponiveis.length > 0 && form.dataAgendamento) {
+    const dataSelecionada = new Date(form.dataAgendamento + 'T00:00:00');
+    const diaSemana = dataSelecionada.toLocaleDateString('pt-BR', { weekday: 'long' });
+    const diaSemanaSimples = diaSemana.split('-')[0].toLowerCase();
+    const removerAcentos = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const atendeNoDia = diasDisponiveis.some(d => removerAcentos(d.toLowerCase()).includes(removerAcentos(diaSemanaSimples)));
+    if (!atendeNoDia) { addToast(`Profissional n\u00e3o atende ${diaSemana}.`, 'warning'); return false; }
+  }
+
   if (prof.horarios && form.horario) {
     const partes = prof.horarios.split('-');
     if (partes.length === 2) {
         const inicioStr = partes[0].trim(); const fimStr = partes[1].trim();
-        if (form.horario < inicioStr || form.horario > fimStr) { addToast(`Horário fora do expediente (${inicioStr} - ${fimStr}).`, 'warning'); return false; }
+        if (form.horario < inicioStr || form.horario > fimStr) { addToast(`Hor\u00e1rio fora do expediente (${inicioStr} - ${fimStr}).`, 'warning'); return false; }
     }
   }
   return true;
 };
 
 function saveAgendamento() {
-    if (!form.paciente || !form.profissional || !form.data || !form.horario) { addToast('Preencha os campos obrigatórios!', 'warning'); return; }
+    if (!form.paciente || !form.profissional || !form.dataAgendamento || !form.horario) { addToast('Preencha os campos obrigatórios!', 'warning'); return; }
     if (!validarAgendamento()) return;
     
     // Unindo data e hora para o Laravel
-    const dataHoraLaravel = `${form.data} ${form.horario}:00`;
+    const dataHoraLaravel = `${form.dataAgendamento} ${form.horario}:00`;
 
     const agendamentoParaSalvar = { 
         paciente_id: parseInt(form.paciente), 
@@ -503,7 +510,7 @@ const openEditDialog = (agendamento) => {
   
   form.paciente = agendamento.paciente_id ? agendamento.paciente_id.toString() : null;
   form.profissional = agendamento.profissional_id ? agendamento.profissional_id.toString() : null; 
-  form.data = agendamento.data;
+  form.dataAgendamento = agendamento.data;
   form.horario = agendamento.horario;
   form.status = agendamento.status; 
   
