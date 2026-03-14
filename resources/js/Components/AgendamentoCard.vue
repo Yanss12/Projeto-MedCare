@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-col lg:flex-row items-center gap-6 bg-white rounded-[32px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 transition-all hover:shadow-md group">
+  <div class="flex flex-col lg:flex-row items-center gap-6 bg-card rounded-[32px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 transition-all hover:shadow-md group">
     <div class="flex-1 space-y-4 w-full">
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <div class="h-12 w-12 rounded-[16px] bg-[#E8F0FF] text-primary flex items-center justify-center">
+          <div class="h-12 w-12 rounded-[16px] bg-primary/10 text-primary flex items-center justify-center">
              <Clock class="w-6 h-6" />
           </div>
           <div>
@@ -18,7 +18,7 @@
         </Badge>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#F4F7FC] rounded-[24px] p-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/40 rounded-[24px] p-4">
         <div class="flex items-center gap-4">
           <div class="h-12 w-12 shrink-0 overflow-hidden rounded-[16px] bg-muted border border-border/50">
              <img :src="`https://api.dicebear.com/7.x/notionists/svg?seed=${agendamento.paciente}&backgroundColor=E8F0FF`" alt="Avatar" class="h-full w-full object-cover" />
@@ -46,7 +46,7 @@
       <button class="flex-1 lg:flex-none h-14 w-full lg:w-16 flex items-center justify-center rounded-[20px] bg-primary text-white hover:bg-primary/90 transition-colors shadow-md shadow-primary/20" @click="$emit('edit', agendamento)" title="Reagendar">
          <Clock class="w-5 h-5 lg:mr-0 mr-2" /> <span class="lg:hidden font-bold">Reagendar</span>
       </button>
-      <button class="flex-1 lg:flex-none h-14 w-full lg:w-16 flex items-center justify-center rounded-[20px] bg-[#F4F7FC] text-destructive hover:bg-destructive hover:text-white transition-colors" @click="$emit('delete', agendamento.id)" title="Cancelar">
+      <button class="flex-1 lg:flex-none h-14 w-full lg:w-16 flex items-center justify-center rounded-[20px] bg-muted/60 text-destructive hover:bg-destructive hover:text-white transition-colors" @click="$emit('delete', agendamento.id)" title="Cancelar">
          <Trash2 class="w-5 h-5 lg:mr-0 mr-2" /> <span class="lg:hidden font-bold">Cancelar</span>
       </button>
     </div>

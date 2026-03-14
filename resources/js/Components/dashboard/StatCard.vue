@@ -6,7 +6,7 @@
       </svg>
     </div>
 
-    <div :class="['mb-6 flex h-[60px] w-[60px] items-center justify-center rounded-[20px] bg-white shadow-sm', theme.icon]">
+    <div :class="['mb-6 flex h-[60px] w-[60px] items-center justify-center rounded-[20px] shadow-sm', theme.icon]">
       <component :is="icon" class="h-8 w-8" />
     </div>
 
@@ -35,19 +35,19 @@ const props = defineProps({
 const theme = computed(() => {
   const themes = {
     blue: {
-      container: 'bg-[#E8F0FF]',
-      icon: 'text-[#4578FF]',
-      text: 'text-[#4578FF]'
+      container: 'bg-[#E8F0FF] dark:bg-blue-950/20',
+      icon: 'text-[#4578FF] dark:text-blue-400 bg-white dark:bg-blue-900/30',
+      text: 'text-[#4578FF] dark:text-blue-400'
     },
     teal: {
-      container: 'bg-[#E0F8FC]',
-      icon: 'text-[#00C2C7]',
-      text: 'text-[#00C2C7]'
+      container: 'bg-[#E0F8FC] dark:bg-teal-950/20',
+      icon: 'text-[#00C2C7] dark:text-teal-400 bg-white dark:bg-teal-900/30',
+      text: 'text-[#00C2C7] dark:text-teal-400'
     },
     purple: {
-      container: 'bg-[#F5E8FF]',
-      icon: 'text-[#A033FF]',
-      text: 'text-[#A033FF]'
+      container: 'bg-[#F5E8FF] dark:bg-purple-950/20',
+      icon: 'text-[#A033FF] dark:text-purple-400 bg-white dark:bg-purple-900/30',
+      text: 'text-[#A033FF] dark:text-purple-400'
     }
   };
   return themes[props.colorId] || themes.blue;

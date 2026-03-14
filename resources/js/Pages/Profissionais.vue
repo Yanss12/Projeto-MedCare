@@ -88,20 +88,20 @@
         <!-- Search -->
         <div class="relative w-full max-w-md">
           <Search class="absolute left-5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"/>
-          <Input v-model="searchTerm" placeholder="Buscar por nome ou especialidade..." class="h-14 w-full rounded-full border-0 bg-white pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium"/>
+          <Input v-model="searchTerm" placeholder="Buscar por nome ou especialidade..." class="h-14 w-full rounded-full border-0 bg-card pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium text-foreground placeholder-muted-foreground transition-shadow"/>
         </div>
 
         <!-- Mini Stats -->
         <div class="flex gap-4"> 
-            <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-3 flex items-center gap-4">
-                <div class="h-8 w-8 rounded-full bg-[#E8F0FF] flex items-center justify-center">
-                   <span class="text-primary font-bold">{{ profissionais.length }}</span>
+            <div class="bg-card rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-3 flex items-center gap-4">
+                <div class="h-8 w-8 rounded-full bg-[#E8F0FF] dark:bg-blue-900/30 flex items-center justify-center">
+                   <span class="text-primary dark:text-blue-400 font-bold">{{ profissionais.length }}</span>
                 </div>
                 <span class="text-sm font-bold text-muted-foreground">Profissionais</span>
             </div>
-            <div class="bg-white rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-3 flex items-center gap-4">
-                <div class="h-8 w-8 rounded-full bg-[#E0F8FC] flex items-center justify-center">
-                   <span class="text-[#00C2C7] font-bold text-xs">{{ totalHoras }}h</span>
+            <div class="bg-card rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-3 flex items-center gap-4">
+                <div class="h-8 w-8 rounded-full bg-[#E0F8FC] dark:bg-teal-900/30 flex items-center justify-center">
+                   <span class="text-[#00C2C7] dark:text-teal-400 font-bold text-xs">{{ totalHoras }}h</span>
                 </div>
                 <span class="text-sm font-bold text-muted-foreground">Horas Voluntárias</span>
             </div>
@@ -109,7 +109,7 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div v-for="prof in filteredProfissionais" :key="prof.id" class="bg-white rounded-[36px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 p-8 transition-all hover:shadow-md group flex flex-col">
+        <div v-for="prof in filteredProfissionais" :key="prof.id" class="bg-card rounded-[36px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 p-8 transition-all hover:shadow-md group flex flex-col">
            <div class="flex items-start gap-5 mb-6">
              <div class="h-16 w-16 shrink-0 overflow-hidden rounded-[20px] bg-muted border border-border/50">
                <img :src="`https://api.dicebear.com/7.x/notionists/svg?seed=${prof.nome}&backgroundColor=E8F0FF`" alt="Avatar" class="h-full w-full object-cover" />
@@ -130,13 +130,13 @@
                <div><p class="text-muted-foreground font-medium">Email</p><p class="font-bold text-foreground truncate">{{ prof.email }}</p></div>
              </div>
              
-             <div class="bg-[#F4F7FC] rounded-[20px] p-4 space-y-3">
+             <div class="bg-background rounded-[20px] p-4 space-y-3">
                <div class="flex items-center gap-2 text-[14px]"> 
                  <Calendar class="w-4 h-4 text-primary" /> 
                  <span class="font-bold text-foreground text-[13px] uppercase tracking-wider">Disponibilidade</span> 
                </div>
                <div class="flex flex-wrap gap-2"> 
-                 <Badge v-for="(dia, index) in prof.disponibilidade" :key="index" variant="outline" class="bg-white text-muted-foreground border-border/50 rounded-full font-bold px-3 py-1 shadow-sm">{{ dia }}</Badge> 
+                 <Badge v-for="(dia, index) in prof.disponibilidade" :key="index" variant="outline" class="bg-card text-muted-foreground border-border/50 rounded-full font-bold px-3 py-1 shadow-sm">{{ dia }}</Badge> 
                </div>
                <div class="flex items-center gap-2 text-[14px] mt-2"> 
                  <Clock class="w-4 h-4 text-[#A033FF]" /> 
@@ -165,7 +165,7 @@
         </div>
       </div>
 
-      <div v-if="filteredProfissionais.length === 0" class="flex flex-col items-center justify-center text-center py-16 bg-white rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
+      <div v-if="filteredProfissionais.length === 0" class="flex flex-col items-center justify-center text-center py-16 bg-card rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
         <div class="h-20 w-20 rounded-[24px] bg-muted/50 flex items-center justify-center mb-6">
           <Search class="h-8 w-8 text-muted-foreground" />
         </div>

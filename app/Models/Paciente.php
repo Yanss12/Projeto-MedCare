@@ -8,7 +8,7 @@ class Paciente extends Model
 {
     protected $fillable = [
         'nome', 'cpf', 'telefone', 'data_nascimento',
-        'endereco', 'necessitatransporte', 'diagnostico', 'alergias', 'medicamentoscontrolados'
+        'endereco', 'necessitatransporte', 'diagnostico', 'alergias', 'medicamentoscontrolados', 'idade', 'foto_url'
     ];
 
     protected $casts = [
