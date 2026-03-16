@@ -7,17 +7,18 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Adiciona o campo idade direto na tabela de pacientes (pra facilitar não ter que calcular sempre).
      */
     public function up(): void
     {
         Schema::table('pacientes', function (Blueprint $table) {
+            // Fica logo depois da data de nascimento pra organizar bonitinho
             $table->integer('idade')->nullable()->after('data_nascimento');
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Apaga a coluna se der rollback.
      */
     public function down(): void
     {

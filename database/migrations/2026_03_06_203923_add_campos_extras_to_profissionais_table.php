@@ -7,21 +7,21 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Incrementa a tabela de profissionais com novos dados.
      */
     public function up(): void
     {
         Schema::table('profissionais', function (Blueprint $table) {
-            $table->string('registro_interno')->nullable();
-            $table->integer('horasvoluntarias')->default(0);
-            $table->json('disponibilidade')->nullable();
-            $table->string('horarios')->nullable();
-            $table->string('status')->default('ativo');
+            $table->string('registro_interno')->nullable(); // Matrícula interna da clínica/hospital
+            $table->integer('horasvoluntarias')->default(0); // Contador de horas para quem trampa voluntário
+            $table->json('disponibilidade')->nullable(); // Ex: dias da semana que ele atende
+            $table->string('horarios')->nullable(); // Faixa de horário
+            $table->string('status')->default('ativo'); // ativo, inativo, ferias...
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Remove as colunas em caso de rollback.
      */
     public function down(): void
     {

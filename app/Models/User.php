@@ -14,7 +14,8 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Os atributos que podem ser preenchidos em massa (mass assignable).
+     * Isso define quais colunas podemos salvar diretamente no banco.
      *
      * @var list<string>
      */
@@ -25,7 +26,8 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Atributos que devem ficar ocultos quando o model for convertido para array ou JSON.
+     * Útil para esconder coisas sensíveis, tipo senha do usuário ou tokens.
      *
      * @var list<string>
      */
@@ -35,7 +37,8 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Configura quais atributos devem ser convertidos (cast) para tipos específicos.
+     * Aqui convertemos data e hora, e dizemos que a senha deve ser tratada como hash.
      *
      * @return array<string, string>
      */

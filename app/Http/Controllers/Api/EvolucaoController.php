@@ -9,7 +9,7 @@ use App\Models\Evolucao;
 class EvolucaoController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista todas as evoluções clínicas/registros de pacientes.
      */
     public function index()
     {
@@ -17,7 +17,7 @@ class EvolucaoController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cria e salva uma nova anotação clínica (evolução).
      */
     public function store(Request $request)
     {
@@ -26,7 +26,7 @@ class EvolucaoController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Mostra os detalhes de uma evolução específica.
      */
     public function show(string $id)
     {
@@ -35,7 +35,7 @@ class EvolucaoController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Atualiza os dados de uma evolução existente.
      */
     public function update(Request $request, string $id)
     {
@@ -45,7 +45,7 @@ class EvolucaoController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove uma evolução do sistema.
      */
     public function destroy(string $id)
     {

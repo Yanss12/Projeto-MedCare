@@ -9,7 +9,7 @@ use App\Models\Agendamento;
 class AgendamentoController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista todos os agendamentos salvos no banco.
      */
     public function index()
     {
@@ -17,16 +17,18 @@ class AgendamentoController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cria um novo agendamento.
      */
     public function store(Request $request)
     {
         $agendamento = Agendamento::create($request->all());
+        
+        // Retorna o agendamento recém-criado com status de sucesso
         return response()->json($agendamento, 201);
     }
 
     /**
-     * Display the specified resource.
+     * Traz as informações de um único agendamento pelo ID.
      */
     public function show(string $id)
     {
@@ -35,7 +37,7 @@ class AgendamentoController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Pega um agendamento existente e atualiza os dados dele.
      */
     public function update(Request $request, string $id)
     {
@@ -45,12 +47,14 @@ class AgendamentoController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Exclui o agendamento.
      */
     public function destroy(string $id)
     {
         $agendamento = Agendamento::findOrFail($id);
         $agendamento->delete();
+        
+        // Retorna status 204 indicando que deu certo e não tem conteúdo pra devolver
         return response()->json(null, 204);
     }
 }

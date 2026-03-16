@@ -7,21 +7,21 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Adiciona novas colunas à tabela pacientes que já existia.
      */
     public function up(): void
     {
         Schema::table('pacientes', function (Blueprint $table) {
-            $table->string('endereco')->nullable();
-            $table->boolean('necessitatransporte')->default(false);
-            $table->text('diagnostico')->nullable();
-            $table->json('alergias')->nullable();
-            $table->json('medicamentoscontrolados')->nullable();
+            $table->string('endereco')->nullable(); // Onde mora
+            $table->boolean('necessitatransporte')->default(false); // Flag pra saber se precisa de ambulância/carência
+            $table->text('diagnostico')->nullable(); // Qual é a condição principal de saúde dele
+            $table->json('alergias')->nullable(); // Guardar array de alergias (ex: ["dipirona", "amendoim"])
+            $table->json('medicamentoscontrolados')->nullable(); // Array de remédios que ele já toma
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Remove essas mesmas colunas inseridas em caso de rollback dessa migration.
      */
     public function down(): void
     {

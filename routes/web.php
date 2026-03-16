@@ -10,7 +10,7 @@ use App\Models\Agendamento;
 use App\Models\Notification;
 use Carbon\Carbon;
 
-// Rota de Login (Pública)
+// Rota de Login (Pública) - Serve a telinha pra fazer o login no sistema
 Route::get('/login', function () {
     if (Auth::check()) {
         return redirect()->intended('/agendamentos');
@@ -41,7 +41,7 @@ Route::post('/logout', function (Request $request) {
     return redirect('/login');
 })->name('logout');
 
-// Rotas Protegidas (Requer Autenticação)
+// Rotas Protegidas (Requer Autenticação) - Daqui em diante a pessoa PRECISA estar logada pra acessar
 Route::middleware(['auth'])->group(function () {
     Route::get('/', function (Request $request) {
         $hoje_real = now()->format('Y-m-d');
@@ -101,7 +101,8 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->name('agendamentos');
 
-    // CRUD de Pacientes
+    // === CRUD de Pacientes === //
+    // Onde tudo de cadastrar, editar e excluir paciente acontece no backend
     Route::post('/pacientes', function (Request $request) {
         $data = $request->validate([
             'nome' => 'required|string',
@@ -246,4 +247,4 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // A rota coringa NotFound (404) será gerenciada automaticamente no front via Vue, 
-// ou usando renderização de erro custom do Laravel/Inertia.
+// ou usando renderização de erro custom do Laravel/Inertia (Não mexe aqui).

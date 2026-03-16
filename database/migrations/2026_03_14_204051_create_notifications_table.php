@@ -7,21 +7,24 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Cria a tabela para gerenciar as notificações do sistema.
      */
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ID único
+            
+            // Relacionamento com usuário: qual usuário vai receber esse aviso
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('message');
-            $table->boolean('is_read')->default(false);
+            
+            $table->string('message'); // O texto da notificação
+            $table->boolean('is_read')->default(false); // Flag pra saber se já foi lida
             $table->timestamps();
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Remove as notificações do banco.
      */
     public function down(): void
     {

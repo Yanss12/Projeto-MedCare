@@ -9,7 +9,7 @@ use App\Models\Profissional;
 class ProfissionalController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Retorna a lista de todos os profissionais cadastrados.
      */
     public function index()
     {
@@ -17,16 +17,18 @@ class ProfissionalController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cadastra um novo profissional no banco.
      */
     public function store(Request $request)
     {
+        // Pega todos os dados enviados e cria direto
         $profissional = Profissional::create($request->all());
-        return response()->json($profissional, 201);
+        
+        return response()->json($profissional, 201); // 201 = Criado com sucesso
     }
 
     /**
-     * Display the specified resource.
+     * Busca um único profissional pelo ID.
      */
     public function show(string $id)
     {
@@ -35,7 +37,7 @@ class ProfissionalController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Edita e atualiza os dados do profissional.
      */
     public function update(Request $request, string $id)
     {
@@ -45,17 +47,21 @@ class ProfissionalController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Tenta deletar um profissional.
      */
     public function destroy(string $id)
     {
         $profissional = Profissional::findOrFail($id);
 
+        // Bloqueio vital: se ele já atendeu alguém, não podemos apagar o histórico!
+        // A orientação é inativar o profissional em vez de deletar fisicamente do banco.
         if ($profissional->agendamentos()->count() > 0 || $profissional->evolucoes()->count() > 0) {
             return response()->json(['error' => 'Não é possível excluir: Este profissional possui agendamentos ou histórico clínico. Por favor, edite o cadastro e mude o status para Inativo.'], 400);
         }
 
+        // Se liberado, apaga mesmo
         $profissional->delete();
+        
         return response()->json(null, 204);
     }
 }

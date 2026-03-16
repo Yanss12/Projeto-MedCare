@@ -7,22 +7,25 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Cria a tabela de vínculos entre o paciente e o profissional para formar o agendamento.
      */
     public function up(): void
     {
         Schema::create('agendamentos', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ID único da consulta/agendamento
+            
+            // Relacionamentos: Se apagar o paciente ou profissional, esse agendamento é deletado em cascata
             $table->foreignId('paciente_id')->constrained('pacientes')->cascadeOnDelete();
             $table->foreignId('profissional_id')->constrained('profissionais')->cascadeOnDelete();
-            $table->dateTime('data_hora');
-            $table->string('status')->default('agendado');
-            $table->timestamps();
+            
+            $table->dateTime('data_hora'); // Quando vai acontecer o atendimento
+            $table->string('status')->default('agendado'); // Status da consulta: agendado, finalizado, cancelado...
+            $table->timestamps(); // Datas de criação e edição do registro
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Reverte a alteração (apaga a tabela).
      */
     public function down(): void
     {

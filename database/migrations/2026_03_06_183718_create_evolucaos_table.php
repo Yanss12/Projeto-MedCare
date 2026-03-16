@@ -7,22 +7,25 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Cria a tabela de evoluções (prontuário/registro clínico do paciente).
      */
     public function up(): void
     {
         Schema::create('evolucoes', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // ID único do registro
+
+            // Informa de qual paciente e de qual profissional é essa anotação (apaga em cascata se excluir os pais)
             $table->foreignId('paciente_id')->constrained('pacientes')->cascadeOnDelete();
             $table->foreignId('profissional_id')->constrained('profissionais')->cascadeOnDelete();
-            $table->text('descricao');
-            $table->date('data_registro');
+            
+            $table->text('descricao'); // O que aconteceu na consulta/atendimento
+            $table->date('data_registro'); // Data de quando a evolução ocorreu
             $table->timestamps();
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Reverte a criação da tabela.
      */
     public function down(): void
     {

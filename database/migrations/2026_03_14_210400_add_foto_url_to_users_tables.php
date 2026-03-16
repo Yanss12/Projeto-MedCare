@@ -7,21 +7,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Adiciona suporte a foto de perfil nos pacientes e profissionais.
      */
     public function up(): void
     {
+        // Add URL da foto no paciente
         Schema::table('pacientes', function (Blueprint $table) {
             $table->string('foto_url', 2048)->nullable()->after('idade');
         });
 
+        // Add URL da foto no profissional
         Schema::table('profissionais', function (Blueprint $table) {
             $table->string('foto_url', 2048)->nullable()->after('status');
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Remove os campos de foto do banco.
      */
     public function down(): void
     {
