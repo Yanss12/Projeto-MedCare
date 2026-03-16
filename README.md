@@ -39,6 +39,7 @@ Este é o sistema completo (API + Frontend Inertia/Vue) CESBEN, desenvolvido par
    composer install
    
    # Instala os pacotes do Node/Vue (como Axios, Inertia, Tailwind)
+   npm install axios
    npm install
    ```
 
