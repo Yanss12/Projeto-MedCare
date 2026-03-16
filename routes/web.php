@@ -8,6 +8,7 @@ use App\Models\Paciente;
 use App\Models\Profissional;
 use App\Models\Agendamento;
 use App\Models\Notification;
+use App\Rules\ValidaCPF;
 use Carbon\Carbon;
 
 // Rota de Login (Pública) - Serve a telinha pra fazer o login no sistema
@@ -19,15 +20,32 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::post('/login', function (Request $request) {
+    // Valida os campos basicos antes de qualquer coisa
     $credentials = $request->validate([
         'email' => ['required', 'email'],
         'password' => ['required'],
     ]);
 
+    // Bloqueia ataques de forca bruta: max 5 tentativas por minuto por email+IP
+    $throttleKey = \Illuminate\Support\Str::lower($request->input('email')) . '|' . $request->ip();
+    $limiter = app(\Illuminate\Cache\RateLimiter::class);
+
+    if ($limiter->tooManyAttempts($throttleKey, 5)) {
+        $seconds = $limiter->availableIn($throttleKey);
+        return back()->withErrors([
+            'email' => "Muitas tentativas de login. Tente novamente em {$seconds} segundos.",
+        ]);
+    }
+
     if (Illuminate\Support\Facades\Auth::attempt($credentials)) {
+        // Login bem-sucedido: limpa o contador de tentativas
+        $limiter->clear($throttleKey);
         $request->session()->regenerate();
         return redirect()->intended('/');
     }
+
+    // Login falhou: incrementa o contador (expira em 60 segundos)
+    $limiter->hit($throttleKey, 60);
 
     return back()->withErrors([
         'email' => 'As credenciais fornecidas não correspondem aos nossos registros.',
@@ -105,16 +123,16 @@ Route::middleware(['auth'])->group(function () {
     // Onde tudo de cadastrar, editar e excluir paciente acontece no backend
     Route::post('/pacientes', function (Request $request) {
         $data = $request->validate([
-            'nome' => 'required|string',
-            'cpf' => 'required|string',
-            'telefone' => 'nullable|string',
-            'endereco' => 'nullable|string',
-            'data_nascimento' => 'nullable|date',
-            'necessitatransporte' => 'boolean',
-            'diagnostico' => 'nullable|string',
-            'alergias' => 'nullable|array',
-            'medicamentoscontrolados' => 'nullable|array',
-            'idade' => 'nullable|integer'
+            'nome'                   => 'required|string|max:255',
+            'cpf'                    => ['nullable', 'string', new ValidaCPF, 'unique:pacientes,cpf'],
+            'telefone'               => 'nullable|string|max:20',
+            'endereco'               => 'nullable|string|max:500',
+            'data_nascimento'        => 'nullable|date|before:today',
+            'necessitatransporte'    => 'boolean',
+            'diagnostico'            => 'nullable|string|max:2000',
+            'alergias'               => 'nullable|array',
+            'medicamentoscontrolados'=> 'nullable|array',
+            'idade'                  => 'nullable|integer|min:0|max:150'
         ]);
         Paciente::create($data);
         Notification::addNotification($request->user()->id, 'Paciente '.$data['nome'].' cadastrado.');
@@ -123,16 +141,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::put('/pacientes/{paciente}', function (Request $request, Paciente $paciente) {
         $data = $request->validate([
-            'nome' => 'required|string',
-            'cpf' => 'required|string',
-            'telefone' => 'nullable|string',
-            'endereco' => 'nullable|string',
-            'data_nascimento' => 'nullable|date',
-            'necessitatransporte' => 'boolean',
-            'diagnostico' => 'nullable|string',
-            'alergias' => 'nullable|array',
-            'medicamentoscontrolados' => 'nullable|array',
-            'idade' => 'nullable|integer'
+            'nome'                   => 'required|string|max:255',
+            'cpf'                    => ['nullable', 'string', new ValidaCPF, 'unique:pacientes,cpf,'.$paciente->id],
+            'telefone'               => 'nullable|string|max:20',
+            'endereco'               => 'nullable|string|max:500',
+            'data_nascimento'        => 'nullable|date|before:today',
+            'necessitatransporte'    => 'boolean',
+            'diagnostico'            => 'nullable|string|max:2000',
+            'alergias'               => 'nullable|array',
+            'medicamentoscontrolados'=> 'nullable|array',
+            'idade'                  => 'nullable|integer|min:0|max:150'
         ]);
         $paciente->update($data);
         Notification::addNotification($request->user()->id, 'Paciente '.$data['nome'].' atualizado.');
