@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between rounded-3xl bg-card p-5 ring-1 ring-border/20 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all hover:shadow-md hover:scale-[1.02] cursor-pointer">
     <div class="flex items-center gap-4">
       <div class="h-12 w-12 shrink-0 overflow-hidden rounded-[16px] bg-muted border border-border/50">
-         <img :src="`https://api.dicebear.com/7.x/notionists/svg?seed=${patient}&backgroundColor=E8F0FF`" alt="Avatar" class="h-full w-full object-cover dark:opacity-80" />
+         <img :src="`https://api.dicebear.com/7.x/notionists/svg?seed=${patient}&backgroundColor=E8F0FF`" alt="Avatar" class="h-full w-full object-cover" />
       </div>
       <div>
         <p class="font-bold text-foreground text-[15px]">{{ patient }}</p>
@@ -31,7 +31,7 @@ const props = defineProps({
 
 const statusClass = computed(() => {
   return props.status === 'Confirmado'
-    ? 'bg-[#E0F8FC] text-[#00C2C7]'
-    : 'bg-[#FFECCC] text-[#FF9E00]'
+    ? 'bg-[#E0F8FC] dark:bg-[#00C2C7]/20 text-[#00C2C7]'
+    : 'bg-[#FFECCC] dark:bg-[#FF9E00]/20 text-[#FF9E00]'
 })
 </script>

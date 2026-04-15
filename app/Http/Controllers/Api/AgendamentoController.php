@@ -9,7 +9,7 @@ use App\Models\Agendamento;
 class AgendamentoController extends Controller
 {
     /**
-     * Lista todos os agendamentos salvos no banco.
+     * Display a listing of the resource.
      */
     public function index()
     {
@@ -17,27 +17,16 @@ class AgendamentoController extends Controller
     }
 
     /**
-     * Cria um novo agendamento.
-     * Valida os dados e verifica existencia de paciente e profissional.
+     * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // Valida os dados: garante que o paciente e profissional existem no banco
-        $data = $request->validate([
-            'paciente_id'     => 'required|integer|exists:pacientes,id',
-            'profissional_id' => 'required|integer|exists:profissionals,id',
-            'data_hora'       => 'required|date|after:now',
-            'status'          => 'required|string|in:Agendado,Confirmado,Cancelado,Realizado',
-        ]);
-
-        $agendamento = Agendamento::create($data);
-
-        // Retorna o agendamento recem-criado com status de sucesso
+        $agendamento = Agendamento::create($request->all());
         return response()->json($agendamento, 201);
     }
 
     /**
-     * Traz as informacoes de um unico agendamento pelo ID.
+     * Display the specified resource.
      */
     public function show(string $id)
     {
@@ -46,34 +35,22 @@ class AgendamentoController extends Controller
     }
 
     /**
-     * Pega um agendamento existente e atualiza os dados dele.
-     * Valida os dados antes de atualizar.
+     * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
         $agendamento = Agendamento::findOrFail($id);
-
-        $data = $request->validate([
-            'paciente_id'     => 'sometimes|required|integer|exists:pacientes,id',
-            'profissional_id' => 'sometimes|required|integer|exists:profissionals,id',
-            'data_hora'       => 'sometimes|required|date',
-            'status'          => 'sometimes|required|string|in:Agendado,Confirmado,Cancelado,Realizado',
-        ]);
-
-        $agendamento->update($data);
+        $agendamento->update($request->all());
         return response()->json($agendamento);
     }
 
     /**
-     * Exclui o agendamento.
+     * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
         $agendamento = Agendamento::findOrFail($id);
         $agendamento->delete();
-
-        // Retorna status 204 indicando que deu certo e nao tem conteudo pra devolver
         return response()->json(null, 204);
     }
 }
-

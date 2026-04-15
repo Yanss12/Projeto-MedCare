@@ -9,7 +9,7 @@ use App\Models\Evolucao;
 class EvolucaoController extends Controller
 {
     /**
-     * Lista todas as evolucoes clinicas/registros de pacientes.
+     * Display a listing of the resource.
      */
     public function index()
     {
@@ -17,28 +17,16 @@ class EvolucaoController extends Controller
     }
 
     /**
-     * Cria e salva uma nova anotacao clinica (evolucao).
-     * Valida todos os campos antes de gravar - dado clinico e sensivel.
+     * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // Validacao dos campos - prontuarios sao dados sensiveis, nao aceitamos qualquer coisa
-        $data = $request->validate([
-            'paciente_id'      => 'required|integer|exists:pacientes,id',
-            'profissional_id'  => 'nullable|integer|exists:profissionals,id',
-            'profissional'     => 'nullable|string|max:255',
-            'data_registro'    => 'required|date',
-            'observacoes'      => 'required|string|max:10000',
-            'prescricoes'      => 'nullable|array',
-            'prescricoes.*'    => 'string|max:500',
-        ]);
-
-        $evolucao = Evolucao::create($data);
+        $evolucao = Evolucao::create($request->all());
         return response()->json($evolucao, 201);
     }
 
     /**
-     * Mostra os detalhes de uma evolucao especifica.
+     * Display the specified resource.
      */
     public function show(string $id)
     {
@@ -47,29 +35,17 @@ class EvolucaoController extends Controller
     }
 
     /**
-     * Atualiza os dados de uma evolucao existente.
-     * Valida antes de atualizar.
+     * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
         $evolucao = Evolucao::findOrFail($id);
-
-        $data = $request->validate([
-            'paciente_id'      => 'sometimes|required|integer|exists:pacientes,id',
-            'profissional_id'  => 'nullable|integer|exists:profissionals,id',
-            'profissional'     => 'nullable|string|max:255',
-            'data_registro'    => 'sometimes|required|date',
-            'observacoes'      => 'sometimes|required|string|max:10000',
-            'prescricoes'      => 'nullable|array',
-            'prescricoes.*'    => 'string|max:500',
-        ]);
-
-        $evolucao->update($data);
+        $evolucao->update($request->all());
         return response()->json($evolucao);
     }
 
     /**
-     * Remove uma evolucao do sistema.
+     * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
@@ -78,4 +54,3 @@ class EvolucaoController extends Controller
         return response()->json(null, 204);
     }
 }
-

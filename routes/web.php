@@ -1,85 +1,55 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Paciente;
-use App\Models\Profissional;
-use App\Models\Agendamento;
-use App\Models\Notification;
-use App\Rules\ValidaCPF;
-use Carbon\Carbon;
 
-// Rota de Login (Pública) - Serve a telinha pra fazer o login no sistema
+// Rota de Login (Pública)
 Route::get('/login', function () {
-    if (Auth::check()) {
-        return redirect()->intended('/agendamentos');
-    }
     return Inertia::render('Login');
 })->name('login');
 
-Route::post('/login', function (Request $request) {
-    // Valida os campos basicos antes de qualquer coisa
+Route::post('/login', function (Illuminate\Http\Request $request) {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
         'password' => ['required'],
     ]);
 
-    // Bloqueia ataques de forca bruta: max 5 tentativas por minuto por email+IP
-    $throttleKey = \Illuminate\Support\Str::lower($request->input('email')) . '|' . $request->ip();
-    $limiter = app(\Illuminate\Cache\RateLimiter::class);
-
-    if ($limiter->tooManyAttempts($throttleKey, 5)) {
-        $seconds = $limiter->availableIn($throttleKey);
-        return back()->withErrors([
-            'email' => "Muitas tentativas de login. Tente novamente em {$seconds} segundos.",
-        ]);
-    }
-
     if (Illuminate\Support\Facades\Auth::attempt($credentials)) {
-        // Login bem-sucedido: limpa o contador de tentativas
-        $limiter->clear($throttleKey);
         $request->session()->regenerate();
         return redirect()->intended('/');
     }
-
-    // Login falhou: incrementa o contador (expira em 60 segundos)
-    $limiter->hit($throttleKey, 60);
 
     return back()->withErrors([
         'email' => 'As credenciais fornecidas não correspondem aos nossos registros.',
     ]);
 });
 
-Route::post('/logout', function (Request $request) {
+Route::post('/logout', function (Illuminate\Http\Request $request) {
     Illuminate\Support\Facades\Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
     return redirect('/login');
 })->name('logout');
 
-// Rotas Protegidas (Requer Autenticação) - Daqui em diante a pessoa PRECISA estar logada pra acessar
+// Rotas Protegidas (Requer Autenticação)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', function (Request $request) {
-        $hoje_real = now()->format('Y-m-d');
-        $data_selecionada = $request->query('date', $hoje_real);
+    Route::get('/', function () {
+        $hoje = now()->format('Y-m-d');
         
-        $totalPacientes = Paciente::count();
-        $totalProfissionais = Profissional::count();
-        $totalConsultasHoje = Agendamento::whereDate('data_hora', $hoje_real)->count();
-
-        $agendamentosFiltro = Agendamento::with(['paciente', 'profissional'])
-            ->whereDate('data_hora', $data_selecionada)
+        $totalPacientes = \App\Models\Paciente::count();
+        $totalProfissionais = \App\Models\Profissional::count();
+        $todosAgendamentos = \App\Models\Agendamento::with(['paciente', 'profissional'])
             ->orderBy('data_hora', 'asc')
             ->get()
             ->map(function ($ag) {
+                $carbonDate = \Carbon\Carbon::parse($ag->data_hora);
                 return [
                     'id' => $ag->id,
                     'paciente' => $ag->paciente->nome ?? 'Desconhecido',
                     'profissional' => $ag->profissional->nome ?? 'Desconhecido',
                     'especialidade' => $ag->profissional->especialidade ?? '',
-                    'horario' => \Carbon\Carbon::parse($ag->data_hora)->format('H:i'),
+                    'data' => $carbonDate->format('Y-m-d'),
+                    'horario' => $carbonDate->format('H:i'),
                     'status' => $ag->status
                 ];
             });
@@ -87,30 +57,68 @@ Route::middleware(['auth'])->group(function () {
         return Inertia::render('Dashboard', [
             'totalPacientes' => $totalPacientes,
             'totalProfissionais' => $totalProfissionais,
-            'totalConsultasHoje' => $totalConsultasHoje,
-            'consultasFiltro' => $agendamentosFiltro,
-            'selectedDate'  => $data_selecionada
+            'todasConsultas' => $todosAgendamentos
         ]);
     })->name('dashboard');
 
     Route::get('/pacientes', function () {
-        $pacientes = Paciente::orderBy('nome')->get();
+        $pacientes = \App\Models\Paciente::orderBy('nome')->get();
         return Inertia::render('Pacientes', [
             'pacientes' => $pacientes
         ]);
     })->name('pacientes');
 
+    Route::post('/pacientes', function (\Illuminate\Http\Request $request) {
+        \App\Models\Paciente::create($request->all());
+        return redirect()->back();
+    });
+
+    Route::put('/pacientes/{id}', function (\Illuminate\Http\Request $request, $id) {
+        $paciente = \App\Models\Paciente::findOrFail($id);
+        $paciente->update($request->all());
+        return redirect()->back();
+    });
+
+    Route::delete('/pacientes/{id}', function ($id) {
+        $paciente = \App\Models\Paciente::findOrFail($id);
+        if ($paciente->agendamentos()->count() > 0 || $paciente->evolucoes()->count() > 0) {
+            return back()->withErrors(['error' => 'Não é possível excluir: Este paciente possui histórico clínico.']);
+        }
+        $paciente->delete();
+        return redirect()->back();
+    });
+
     Route::get('/profissionais', function () {
-        $profissionais = Profissional::orderBy('nome')->get();
+        $profissionais = \App\Models\Profissional::orderBy('nome')->get();
         return Inertia::render('Profissionais', [
             'profissionais' => $profissionais
         ]);
     })->name('profissionais');
 
+    Route::post('/profissionais', function (\Illuminate\Http\Request $request) {
+        \App\Models\Profissional::create($request->all());
+        return redirect()->back();
+    });
+
+    Route::put('/profissionais/{id}', function (\Illuminate\Http\Request $request, $id) {
+        $profissional = \App\Models\Profissional::findOrFail($id);
+        $profissional->update($request->all());
+        return redirect()->back();
+    });
+
+    Route::delete('/profissionais/{id}', function ($id) {
+        $profissional = \App\Models\Profissional::findOrFail($id);
+        if ($profissional->agendamentos()->count() > 0 || $profissional->evolucoes()->count() > 0) {
+            return back()->withErrors(['error' => 'Não é possível excluir: Este profissional possui histórico clínico.']);
+        }
+        $profissional->delete();
+        return redirect()->back();
+    });
+
     Route::get('/agendamentos', function () {
-        $agendamentos = Agendamento::all();
-        $pacientes = Paciente::orderBy('nome')->get();
-        $profissionais = Profissional::orderBy('nome')->get();
+        $agendamentos = \App\Models\Agendamento::all();
+        $pacientes = \App\Models\Paciente::orderBy('nome')->get();
+        $profissionais = \App\Models\Profissional::orderBy('nome')->get();
 
         return Inertia::render('Agendamentos', [
             'agendamentos' => $agendamentos,
@@ -119,150 +127,53 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->name('agendamentos');
 
-    // === CRUD de Pacientes === //
-    // Onde tudo de cadastrar, editar e excluir paciente acontece no backend
-    Route::post('/pacientes', function (Request $request) {
-        $data = $request->validate([
-            'nome'                   => 'required|string|max:255',
-            'cpf'                    => ['nullable', 'string', new ValidaCPF, 'unique:pacientes,cpf'],
-            'telefone'               => 'nullable|string|max:20',
-            'endereco'               => 'nullable|string|max:500',
-            'data_nascimento'        => 'nullable|date|before:today',
-            'necessitatransporte'    => 'boolean',
-            'diagnostico'            => 'nullable|string|max:2000',
-            'alergias'               => 'nullable|array',
-            'medicamentoscontrolados'=> 'nullable|array',
-            'idade'                  => 'nullable|integer|min:0|max:150'
-        ]);
-        Paciente::create($data);
-        Notification::addNotification($request->user()->id, 'Paciente '.$data['nome'].' cadastrado.');
-        return redirect()->back()->with('success', 'Paciente cadastrado.');
+    Route::post('/agendamentos', function (\Illuminate\Http\Request $request) {
+        \App\Models\Agendamento::create($request->all());
+        return redirect()->back();
     });
 
-    Route::put('/pacientes/{paciente}', function (Request $request, Paciente $paciente) {
-        $data = $request->validate([
-            'nome'                   => 'required|string|max:255',
-            'cpf'                    => ['nullable', 'string', new ValidaCPF, 'unique:pacientes,cpf,'.$paciente->id],
-            'telefone'               => 'nullable|string|max:20',
-            'endereco'               => 'nullable|string|max:500',
-            'data_nascimento'        => 'nullable|date|before:today',
-            'necessitatransporte'    => 'boolean',
-            'diagnostico'            => 'nullable|string|max:2000',
-            'alergias'               => 'nullable|array',
-            'medicamentoscontrolados'=> 'nullable|array',
-            'idade'                  => 'nullable|integer|min:0|max:150'
-        ]);
-        $paciente->update($data);
-        Notification::addNotification($request->user()->id, 'Paciente '.$data['nome'].' atualizado.');
-        return redirect()->back()->with('success', 'Paciente atualizado.');
+    Route::put('/agendamentos/{id}', function (\Illuminate\Http\Request $request, $id) {
+        $agendamento = \App\Models\Agendamento::findOrFail($id);
+        $agendamento->update($request->all());
+        return redirect()->back();
     });
 
-    Route::delete('/pacientes/{paciente}', function (Request $request, Paciente $paciente) {
-        $name = $paciente->nome;
-        $paciente->delete();
-        Notification::addNotification($request->user()->id, 'Paciente '.$name.' removido.');
-        return redirect()->back()->with('success', 'Paciente excluído com sucesso.');
-    });
-
-    // CRUD de Profissionais
-    Route::post('/profissionais', function (Request $request) {
-        $data = $request->validate([
-            'nome' => 'required|string',
-            'especialidade' => 'required|string',
-            'crm' => 'required|string',
-            'registro_interno' => 'nullable|string',
-            'telefone' => 'nullable|string',
-            'email' => 'nullable|email',
-            'horasvoluntarias' => 'nullable|numeric',
-            'disponibilidade' => 'nullable|array',
-            'horarios' => 'nullable|string',
-            'status' => 'nullable|string',
-        ]);
-        Profissional::create($data);
-        Notification::addNotification($request->user()->id, 'Profissional '.$data['nome'].' adicionado.');
-        return redirect()->back()->with('success', 'Profissional cadastrado.');
-    });
-
-    Route::put('/profissionais/{profissional}', function (Request $request, Profissional $profissional) {
-        $data = $request->validate([
-            'nome' => 'required|string',
-            'especialidade' => 'required|string',
-            'crm' => 'required|string',
-            'registro_interno' => 'nullable|string',
-            'telefone' => 'nullable|string',
-            'email' => 'nullable|email',
-            'horasvoluntarias' => 'nullable|numeric',
-            'disponibilidade' => 'nullable|array',
-            'horarios' => 'nullable|string',
-            'status' => 'nullable|string',
-        ]);
-        $profissional->update($data);
-        Notification::addNotification($request->user()->id, 'Profissional '.$data['nome'].' editado.');
-        return redirect()->back()->with('success', 'Profissional atualizado.');
-    });
-
-    Route::delete('/profissionais/{profissional}', function (Request $request, Profissional $profissional) {
-        $name = $profissional->nome;
-        $profissional->delete();
-        Notification::addNotification($request->user()->id, 'Profissional '.$name.' removido.');
-        return redirect()->back()->with('success', 'Profissional excluído com sucesso.');
-    });
-
-    // CRUD de Agendamentos pela Web
-    Route::post('/agendamentos', function (Request $request) {
-        $data = $request->validate([
-            'paciente_id' => 'required|exists:pacientes,id',
-            'profissional_id' => 'required|exists:profissionais,id',
-            'data_hora' => 'required|date',
-            'status' => 'required|string',
-        ]);
-        Agendamento::create($data);
-        
-        $pacienteData = Paciente::find($data['paciente_id']);
-        $nomePaciente = $pacienteData ? $pacienteData->nome : 'um paciente';
-        Notification::addNotification($request->user()->id, 'Nova consulta agendada para '.$nomePaciente.'.');
-        return redirect()->back()->with('success', 'Agendamento criado com sucesso.');
-    });
-
-    Route::put('/agendamentos/{agendamento}', function (Request $request, Agendamento $agendamento) {
-        $data = $request->validate([
-            'paciente_id' => 'required|exists:pacientes,id',
-            'profissional_id' => 'required|exists:profissionais,id',
-            'data_hora' => 'required|date',
-            'status' => 'required|string',
-        ]);
-        $agendamento->update($data);
-        Notification::addNotification($request->user()->id, 'Status de agendamento alterado para '.$data['status'].'.');
-        return redirect()->back()->with('success', 'Agendamento atualizado com sucesso.');
-    });
-
-    Route::delete('/agendamentos/{agendamento}', function (Request $request, Agendamento $agendamento) {
+    Route::delete('/agendamentos/{id}', function ($id) {
+        $agendamento = \App\Models\Agendamento::findOrFail($id);
         $agendamento->delete();
-        Notification::addNotification($request->user()->id, 'Agendamento cancelado/excluído.');
-        return redirect()->back()->with('success', 'Agendamento excluído com sucesso.');
+        return redirect()->back();
+    });
+
+    Route::post('/evolucoes', function (\Illuminate\Http\Request $request) {
+        \App\Models\Evolucao::create($request->all());
+        return redirect()->back();
+    });
+
+    Route::put('/evolucoes/{id}', function (\Illuminate\Http\Request $request, $id) {
+        $evolucao = \App\Models\Evolucao::findOrFail($id);
+        $evolucao->update($request->all());
+        return redirect()->back();
+    });
+
+    Route::delete('/evolucoes/{id}', function ($id) {
+        $evolucao = \App\Models\Evolucao::findOrFail($id);
+        $evolucao->delete();
+        return redirect()->back();
     });
 
     Route::get('/prontuarios', function () {
-        $pacientes = Paciente::with(['evolucoes' => function($query) {
+        $pacientes = \App\Models\Paciente::with(['evolucoes' => function($query) {
             $query->orderBy('data_registro', 'desc');
         }])->orderBy('nome')->get();
         
-        $profissionais = Profissional::orderBy('nome')->get();
+        $profissionais = \App\Models\Profissional::orderBy('nome')->get();
 
         return Inertia::render('Prontuarios', [
             'prontuarios' => $pacientes,
             'profissionais' => $profissionais
         ]);
     })->name('prontuarios');
-
-    Route::post('/notifications/mark-read', function (Request $request) {
-        Notification::where('user_id', $request->user()->id)
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
-        
-        return redirect()->back();
-    })->name('notifications.mark.read');
 });
 
 // A rota coringa NotFound (404) será gerenciada automaticamente no front via Vue, 
-// ou usando renderização de erro custom do Laravel/Inertia (Não mexe aqui).
+// ou usando renderização de erro custom do Laravel/Inertia.

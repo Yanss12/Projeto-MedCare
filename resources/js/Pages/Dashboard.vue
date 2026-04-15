@@ -2,59 +2,55 @@
   <Head title="Dashboard" />
   <Layout>
     <div class="mx-auto w-full max-w-7xl">
-      <div class="grid lg:grid-cols-12 gap-8 lg:gap-12">
+      <div class="grid lg:grid-cols-4 gap-8">
         <!-- Main Content -->
-        <div class="lg:col-span-7 space-y-8">
+        <div class="lg:col-span-3 space-y-8">
            <!-- Top bar title and date -->
-             <div class="flex items-center justify-between">
-              <h1 class="text-[32px] font-bold text-foreground tracking-tight">Dashboard</h1>
-              <!-- Date Picker mock -->
-              <div class="flex items-center gap-2 bg-card px-5 py-3 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.02)] ring-1 ring-border/20 hover:bg-muted/30 cursor-pointer transition-colors max-w-fit">
-                <CalendarDays class="h-4 w-4 text-muted-foreground"/>
-                <span class="text-[13px] font-bold text-muted-foreground pl-1 capitalize">{{ displayDateTop }}</span>
-              </div>
-            </div>
+           <div class="flex items-center justify-between">
+             <h1 class="text-[32px] font-bold text-foreground tracking-tight">Dashboard</h1>
+             <!-- Date Picker mock -->
+             <div class="flex items-center gap-2 bg-card px-5 py-3 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.02)] ring-1 ring-border/20 hover:bg-muted/30 transition-colors">
+               <CalendarDays class="h-4 w-4 text-muted-foreground"/>
+               <span class="text-[13px] font-bold text-muted-foreground pl-1">{{ formatDateDisplay(dateStr) }}</span>
+             </div>
+           </div>
 
            <!-- 3 Cards -->
            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
              <StatCard title="Total Pacientes" :value="totalPacientes.toString()" subtitle="Pacientes Cadastrados" :icon="Users" colorId="blue" />
              <StatCard title="Profissionais" :value="totalProfissionais.toString()" subtitle="Médicos Ativos" :icon="UserCheck" colorId="teal" />
-             <StatCard title="Consultas Hoje" :value="totalConsultasHoje.toString()" subtitle="Agendamentos" :icon="CalendarDays" colorId="purple" />
+             <StatCard title="Consultas Hoje" :value="countConsultasHoje.toString()" subtitle="Agendamentos" :icon="CalendarDays" colorId="purple" />
            </div>
 
            <!-- Activity Chart Mock -->
            <div class="rounded-[40px] shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-0 bg-card ring-1 ring-border/20 relative overflow-hidden">
              <div class="px-8 pt-8 pb-4 flex flex-row items-center justify-between relative z-10 w-full">
                <h2 class="text-[22px] font-bold text-foreground">Activity</h2>
-               <div class="flex items-center bg-muted/50 p-1.5 rounded-full text-sm font-bold">
-                 <button @click="chartPeriod = 'semanal'" :class="['px-6 py-2.5 rounded-full cursor-pointer transition-all', chartPeriod === 'semanal' ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105' : 'text-muted-foreground hover:text-foreground']">Semanal</button>
-                 <button @click="chartPeriod = 'mensal'" :class="['px-6 py-2.5 rounded-full cursor-pointer transition-all', chartPeriod === 'mensal' ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105' : 'text-muted-foreground hover:text-foreground']">Mensal</button>
-                 <button @click="chartPeriod = 'anual'" :class="['px-6 py-2.5 rounded-full cursor-pointer transition-all', chartPeriod === 'anual' ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105' : 'text-muted-foreground hover:text-foreground']">Anual</button>
+               <div class="flex items-center bg-muted p-1.5 rounded-full text-sm font-bold">
+                 <button @click="chartMode = 'Semanal'" :class="chartMode === 'Semanal' ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105' : 'text-muted-foreground hover:text-foreground'" class="px-6 py-2.5 rounded-full transition-all cursor-pointer">Semanal</button>
+                 <button @click="chartMode = 'Mensal'" :class="chartMode === 'Mensal' ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105' : 'text-muted-foreground hover:text-foreground'" class="px-6 py-2.5 rounded-full transition-all cursor-pointer">Mensal</button>
+                 <button @click="chartMode = 'Anual'" :class="chartMode === 'Anual' ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105' : 'text-muted-foreground hover:text-foreground'" class="px-6 py-2.5 rounded-full transition-all cursor-pointer">Anual</button>
                </div>
              </div>
              <div class="px-8 pb-8 pt-6 relative z-10">
                <div class="relative w-full h-[280px] bg-card rounded-2xl flex items-end">
-                 <!-- SVG Mock of bezier chart -->
+                 <!-- SVG dynamically generated chart -->
                  <svg preserveAspectRatio="none" class="w-full h-full" viewBox="0 0 1000 300" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <!-- Grid lines -->
-                    <line x1="0" y1="250" x2="1000" y2="250" stroke="currentColor" stroke-opacity="0.1" stroke-linecap="round" stroke-width="2" stroke-dasharray="8 8" />
-                    <line x1="0" y1="150" x2="1000" y2="150" stroke="currentColor" stroke-opacity="0.1" stroke-linecap="round" stroke-width="2" stroke-dasharray="8 8" />
-                    <line x1="0" y1="50" x2="1000" y2="50" stroke="currentColor" stroke-opacity="0.1" stroke-linecap="round" stroke-width="2" stroke-dasharray="8 8" />
+                    <line x1="0" y1="250" x2="1000" y2="250" stroke="#F1F5F9" stroke-linecap="round" stroke-width="2" stroke-dasharray="8 8" />
+                    <line x1="0" y1="150" x2="1000" y2="150" stroke="#F1F5F9" stroke-linecap="round" stroke-width="2" stroke-dasharray="8 8" />
+                    <line x1="0" y1="50" x2="1000" y2="50" stroke="#F1F5F9" stroke-linecap="round" stroke-width="2" stroke-dasharray="8 8" />
                     
-                    <!-- Dark Navy Line -->
-                    <path d="M0 250 C 100 250, 200 180, 300 190 C 400 200, 500 100, 600 150 C 700 200, 800 150, 900 180 C 1000 200, 1000 250, 1000 250" class="stroke-foreground opacity-60" stroke-width="3" stroke-linecap="round"/>
+                    <path :d="svgPath" stroke="#4578FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" class="transition-all duration-500 ease-in-out"/>
                     
-                    <!-- Royal Blue Line -->
-                    <path d="M0 220 C 100 200, 150 250, 250 250 C 350 250, 450 150, 550 50 C 650 -50, 750 150, 850 150 C 950 150, 1000 100, 1000 100" class="stroke-primary" stroke-width="5" stroke-linecap="round"/>
-                    
-                    <!-- Floating Tooltip dot -->
-                    <circle cx="550" cy="50" r="8" fill="currentColor" class="text-card stroke-primary" stroke-width="5" />
+                    <!-- Floating Tooltip dots -> only for the last point for aesthetics -->
+                    <circle v-if="chartData.length" :cx="lastPointX" :cy="lastPointY" r="8" fill="hsl(var(--card))" stroke="#4578FF" stroke-width="5" class="drop-shadow-md transition-all duration-500 ease-in-out" />
                  </svg>
                  
-                 <!-- Tooltip HTML -->
-                 <div class="absolute top-[10%] left-[55%] -translate-x-1/2 -mt-16 bg-popover text-popover-foreground px-5 py-3 rounded-[20px] shadow-xl ring-1 ring-border/10 flex flex-col items-center">
-                   <span class="text-base font-extrabold text-foreground">{{ chartPeriod === 'semanal' ? '38 Consultas' : (chartPeriod === 'anual' ? '1,842 Consultas' : '152 Consultas') }}</span>
-                   <span class="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5">{{ chartPeriod === 'semanal' ? 'Esta Semana' : (chartPeriod === 'anual' ? 'Em 2026' : 'Agosto') }}</span>
+                 <!-- Tooltip HTML mapped to last point approx -->
+                 <div class="absolute top-0 right-0 bg-card px-5 py-3 rounded-[20px] shadow-xl ring-1 ring-border/10 flex flex-col items-center">
+                   <span class="text-base font-extrabold text-foreground">{{ totalInChart }} Consultas</span>
+                   <span class="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5">{{ chartMode }}</span>
                  </div>
                </div>
              </div>
@@ -63,7 +59,7 @@
            <div class="grid grid-cols-2 gap-6 pb-12">
              <!-- Recommendation -->
               <div class="bg-card rounded-[36px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 p-8 flex items-center gap-6 group hover:shadow-md transition-shadow cursor-pointer">
-                 <div class="h-[72px] w-[72px] shrink-0 rounded-[24px] bg-[#FF9E00]/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+                 <div class="h-[72px] w-[72px] shrink-0 rounded-[24px] bg-[#FFECCC] flex items-center justify-center group-hover:scale-105 transition-transform text-[#FF9E00] dark:bg-[#FF9E00]/20">
                    <Lightbulb class="h-8 w-8 text-[#FF9E00]" />
                  </div>
                  <div>
@@ -74,7 +70,7 @@
               
               <!-- Treatment -->
               <div class="bg-card rounded-[36px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 p-8 flex items-center gap-6 group hover:shadow-md transition-shadow cursor-pointer">
-                 <div class="h-[72px] w-[72px] shrink-0 rounded-[24px] bg-[#A033FF]/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+                 <div class="h-[72px] w-[72px] shrink-0 rounded-[24px] bg-[#F5E8FF] flex items-center justify-center group-hover:scale-105 transition-transform text-[#A033FF] dark:bg-[#A033FF]/20">
                    <Stethoscope class="h-8 w-8 text-[#A033FF]" />
                  </div>
                  <div>
@@ -86,39 +82,54 @@
         </div>
 
         <!-- Right Pane -->
-        <div class="lg:col-span-5 border-l border-border/50 pl-6 lg:pl-10 space-y-10 pb-10">
+        <div class="lg:col-span-1 border-l border-border/50 pl-8 space-y-10 pb-10">
            <!-- Mock Calendar -->
            <div class="space-y-6">
-             <h2 class="text-[22px] font-bold flex justify-between items-center text-foreground capitalize">
-               {{ displayDateTitle }}
-               <div class="h-9 w-9 rounded-full bg-card flex items-center justify-center shadow-sm ring-1 ring-border/20 cursor-pointer hover:bg-muted/50 transition-colors">
-                 <ChevronRight class="h-5 w-5 text-muted-foreground" />
+             <h2 class="text-[22px] font-bold flex justify-between items-center text-foreground">
+               <span class="capitalize">{{ formattedCurrentMonthYear }}</span>
+               <div class="flex items-center gap-2">
+                 <div @click="prevMonth" class="h-9 w-9 rounded-full bg-card flex items-center justify-center shadow-sm ring-1 ring-border/20 cursor-pointer hover:bg-muted/50 transition-colors">
+                   <ChevronLeft class="h-5 w-5 text-muted-foreground" />
+                 </div>
+                 <div @click="nextMonth" class="h-9 w-9 rounded-full bg-card flex items-center justify-center shadow-sm ring-1 ring-border/20 cursor-pointer hover:bg-muted/50 transition-colors">
+                   <ChevronRight class="h-5 w-5 text-muted-foreground" />
+                 </div>
                </div>
-              </h2>
+             </h2>
              
-             <!-- FIXED: The Calendar wrapper logic. Changed to just bg-card and ensure w-full respects padding -->
-             <div class="bg-card rounded-[40px] px-8 py-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-border/20 flex flex-col items-center justify-center overflow-hidden min-h-[350px]">
-                 <Calendar 
-                   v-model="selectedDateValue" 
-                   mode="single" 
-                   locale="pt-BR" 
-                   class="transform scale-110 origin-center"
-                 />
+             <div class="bg-card rounded-[40px] p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-border/20">
+               <div class="grid grid-cols-7 gap-y-5 gap-x-2 text-center text-sm">
+                 <div class="font-bold text-muted-foreground text-[10px] uppercase mb-2 tracking-wider">Dom</div>
+                 <div class="font-bold text-muted-foreground text-[10px] uppercase mb-2 tracking-wider">Seg</div>
+                 <div class="font-bold text-muted-foreground text-[10px] uppercase mb-2 tracking-wider">Ter</div>
+                 <div class="font-bold text-muted-foreground text-[10px] uppercase mb-2 tracking-wider">Qua</div>
+                 <div class="font-bold text-muted-foreground text-[10px] uppercase mb-2 tracking-wider">Qui</div>
+                 <div class="font-bold text-muted-foreground text-[10px] uppercase mb-2 tracking-wider">Sex</div>
+                 <div class="font-bold text-muted-foreground text-[10px] uppercase mb-2 tracking-wider">Sáb</div>
+                 
+                 <div v-for="d in calendarDays" :key="d.id"
+                      @click="selectDate(d.fullDate)"
+                      :class="{ 
+                        'text-muted-foreground/30 font-bold': !d.current,
+                        'font-bold text-foreground flex items-center justify-center h-8 cursor-pointer hover:bg-muted/50 rounded-full transition-colors relative': d.current && !d.isSelected,
+                        'font-bold text-white bg-primary rounded-full flex items-center justify-center h-8 shadow-md shadow-primary/40 relative scale-110 cursor-pointer z-10': d.isSelected 
+                      }">
+                      <span>{{ d.day }}</span>
+                      <span v-if="d.hasAppointments && !d.isSelected" class="absolute -bottom-1.5 h-1.5 w-1.5 bg-primary rounded-full"></span>
+                 </div>
+               </div>
              </div>
            </div>
            
-           <div class="space-y-6 mt-10">
+           <div class="space-y-6">
              <div class="flex items-center justify-between">
-               <h2 class="text-[22px] font-bold text-foreground">Consultas Recentes</h2>
-               <div class="rounded-full bg-card flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] ring-1 ring-border/20 py-2 w-24 cursor-pointer hover:bg-muted/50 transition-colors">
-                 <span class="text-[12px] font-bold text-foreground">Ver Todas</span>
-               </div>
+               <h2 class="text-[22px] font-bold text-foreground">{{ formattedSelectedDateText }}</h2>
              </div>
              
              <div class="space-y-5">
-               <template v-if="consultasFiltro.length > 0">
+               <template v-if="consultasDoDia.length > 0">
                  <AppointmentItem
-                   v-for="consulta in consultasFiltro.slice(0, 4)"
+                   v-for="consulta in consultasDoDia"
                    :key="consulta.id"
                    :patient="consulta.paciente"
                    :doctor="`${consulta.profissional} - ${consulta.especialidade}`"
@@ -132,7 +143,7 @@
                      <CalendarDays class="h-6 w-6 text-muted-foreground" />
                    </div>
                    <p class="text-[15px] font-bold text-muted-foreground">
-                     Nenhuma consulta<br/>recente.
+                     Nenhuma consulta<br/>neste dia.
                    </p>
                  </div>
                </template>
@@ -145,53 +156,150 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import Layout from '@/Components/Layout.vue';
 import {
-  Users,
-  UserCheck,
-  CalendarDays,
-  BarChart3,
-  ChevronRight,
-  Lightbulb,
-  Stethoscope
+  Users, UserCheck, CalendarDays, BarChart3, ChevronRight, ChevronLeft, Lightbulb, Stethoscope
 } from 'lucide-vue-next';
 import StatCard from '@/Components/dashboard/StatCard.vue';
 import AppointmentItem from '@/Components/dashboard/AppointmentItem.vue';
-import { Calendar } from '@/Components/ui/calendar';
-import { parseDate, getLocalTimeZone } from '@internationalized/date';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-
-const chartPeriod = ref('mensal');
+import { ref, computed } from 'vue';
 
 const props = defineProps({
     totalPacientes: { type: Number, default: 0 },
     totalProfissionais: { type: Number, default: 0 },
-    totalConsultasHoje: { type: Number, default: 0 },
-    consultasFiltro: { type: Array, default: () => [] },
-    selectedDate: { type: String, default: () => new Date().toISOString().split('T')[0] }
+    todasConsultas: { type: Array, default: () => [] }
 });
 
-const selectedDateValue = ref(parseDate(props.selectedDate));
+const today = new Date();
+const currentMonth = ref(today.getMonth());
+const currentYear = ref(today.getFullYear());
 
-const displayDateTitle = computed(() => {
-    if (!selectedDateValue.value) return '';
-    const date = selectedDateValue.value.toDate(getLocalTimeZone());
-    return format(date, "MMMM yyyy", { locale: ptBR });
-});
+// Helpers date formatting
+const pad = (n) => n.toString().padStart(2, '0');
+const formatDateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 
-const displayDateTop = computed(() => {
-    if (!selectedDateValue.value) return '';
-    const date = selectedDateValue.value.toDate(getLocalTimeZone());
-    return format(date, "dd MMMM yyyy", { locale: ptBR });
-});
+const dateStr = formatDateStr(today);
+const selectedDate = ref(dateStr);
 
-watch(selectedDateValue, (newVal) => {
-    if (newVal) {
-        const dateStr = newVal.toString();
-        router.get('/', { date: dateStr }, { preserveState: true, preserveScroll: true });
+// Top header full display date
+const formatDisplayLoc = (dateObj) => {
+    return dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+};
+const formatDateDisplay = (dateStrVal) => {
+    return formatDisplayLoc(new Date(dateStrVal + 'T00:00:00'));
+};
+
+const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+const formattedCurrentMonthYear = computed(() => `${monthNames[currentMonth.value]} ${currentYear.value}`);
+
+const prevMonth = () => {
+    if (currentMonth.value === 0) { currentMonth.value = 11; currentYear.value--; }
+    else currentMonth.value--;
+};
+
+const nextMonth = () => {
+    if (currentMonth.value === 11) { currentMonth.value = 0; currentYear.value++; }
+    else currentMonth.value++;
+};
+
+const calendarDays = computed(() => {
+    const days = [];
+    const firstDay = new Date(currentYear.value, currentMonth.value, 1).getDay();
+    const daysInMonth = new Date(currentYear.value, currentMonth.value + 1, 0).getDate();
+    const prevMonthDays = new Date(currentYear.value, currentMonth.value, 0).getDate();
+
+    for (let i = firstDay - 1; i >= 0; i--) {
+        days.push({ id: `prev-${i}`, day: prevMonthDays - i, current: false, fullDate: null });
     }
+    for (let i = 1; i <= daysInMonth; i++) {
+        const d = new Date(currentYear.value, currentMonth.value, i);
+        const fStr = formatDateStr(d);
+        const hasAppointments = props.todasConsultas.some(ac => ac.data === fStr && ac.status !== 'cancelado');
+        days.push({
+            id: `cur-${i}`,
+            day: i,
+            current: true,
+            fullDate: fStr,
+            isSelected: fStr === selectedDate.value,
+            hasAppointments
+        });
+    }
+    return days;
+});
+
+const selectDate = (fDate) => { if(fDate) selectedDate.value = fDate; };
+
+const consultasDoDia = computed(() => props.todasConsultas.filter(c => c.data === selectedDate.value));
+const countConsultasHoje = computed(() => props.todasConsultas.filter(c => c.data === dateStr).length);
+
+const formattedSelectedDateText = computed(() => {
+    if (selectedDate.value === dateStr) return "Consultas Hoje";
+    const d = new Date(selectedDate.value + 'T00:00:00');
+    return `Consultas de ${d.getDate()} de ${monthNames[d.getMonth()]}`;
+});
+
+// CHART ACTIVITY STATE
+const chartMode = ref('Mensal'); 
+const totalInChart = ref(0);
+
+const chartData = computed(() => {
+    const pts = [];
+    let tot = 0;
+    if (chartMode.value === 'Semanal') {
+       for(let i=6; i>=0; i--) {
+           const d = new Date(); d.setDate(today.getDate() - i);
+           const m = props.todasConsultas.filter(x => x.data === formatDateStr(d)).length;
+           pts.push(m); tot+=m;
+       }
+    } else if (chartMode.value === 'Mensal') {
+       // Just grab last 30 days and group nicely to 4 points / weeks to look good in the line chart
+       let p1=0,p2=0,p3=0,p4=0;
+       for(let i=29; i>=0; i--){
+           const d = new Date(); d.setDate(today.getDate() - i);
+           const amt = props.todasConsultas.filter(x => x.data === formatDateStr(d)).length;
+           if(i >= 22) p1+=amt;
+           else if(i >= 15) p2+=amt;
+           else if(i >= 8) p3+=amt;
+           else p4+=amt;
+       }
+       pts.push(p1,p2,p3,p4);
+       tot = p1+p2+p3+p4;
+    } else {
+       for(let i=0; i<12; i++) {
+          const amt = props.todasConsultas.filter(x => new Date(x.data+'T00:00:00').getFullYear() === currentYear.value && new Date(x.data+'T00:00:00').getMonth() === i).length;
+          pts.push(amt); tot+=amt;
+       }
+    }
+    totalInChart.value = tot;
+    return pts;
+});
+
+const lastPointX = ref(1000);
+const lastPointY = ref(250);
+
+const svgPath = computed(() => {
+    const data = chartData.value;
+    if (data.length === 0) return '';
+    const max = Math.max(...data, 10);
+    const w = 1000;
+    const stepX = w / (data.length - 1 || 1);
+    
+    const points = data.map((val, i) => {
+        return { x: i * stepX, y: 250 - (val / max) * 180 };
+    });
+
+    lastPointX.value = points[points.length - 1].x;
+    lastPointY.value = points[points.length - 1].y;
+
+    let d = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const cx1 = (p1.x + p2.x) / 2;
+        d += ` C ${cx1} ${p1.y}, ${cx1} ${p2.y}, ${p2.x} ${p2.y}`;
+    }
+    return d;
 });
 </script>

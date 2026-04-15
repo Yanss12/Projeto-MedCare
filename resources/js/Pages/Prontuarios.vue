@@ -68,7 +68,7 @@
 
       <div class="relative w-full max-w-md mb-8">
         <Search class="absolute left-5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"/>
-        <Input v-model="searchTerm" placeholder="Buscar prontuário por paciente..." class="h-14 w-full rounded-full border-0 bg-card pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium text-foreground placeholder-muted-foreground transition-shadow"/>
+        <Input v-model="searchTerm" placeholder="Buscar prontuário por paciente..." class="h-14 w-full rounded-full border-0 bg-card pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium"/>
       </div>
 
       <div class="space-y-8">
@@ -81,7 +81,7 @@
       </div>
 
       <div v-if="filteredProntuarios.length === 0" class="flex flex-col items-center justify-center text-center py-16 bg-card rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
-        <div class="h-20 w-20 rounded-[24px] bg-muted/50 flex items-center justify-center mb-6">
+        <div class="h-20 w-20 rounded-[24px] bg-muted flex items-center justify-center mb-6">
           <Search class="h-8 w-8 text-muted-foreground" />
         </div>
         <p class="text-[16px] font-bold text-muted-foreground">

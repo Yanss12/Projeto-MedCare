@@ -8,12 +8,12 @@
         <div>
           <h3 class="text-[24px] font-bold text-foreground">{{ prontuario.nome }}</h3>
           <div class="flex flex-wrap gap-2 mt-2">
-            <Badge variant="outline" class="bg-[#F4F7FC] text-primary border-0 rounded-full px-4 py-1.5 font-bold tracking-wide shadow-sm shadow-black/5">{{ prontuario.diagnostico || 'Sem diagnóstico' }}</Badge>
+            <Badge variant="outline" class="bg-muted text-primary border-0 rounded-full px-4 py-1.5 font-bold tracking-wide shadow-sm shadow-black/5">{{ prontuario.diagnostico || 'Sem diagnóstico' }}</Badge>
           </div>
         </div>
       </div>
-      <div class="bg-[#FFF4E5] dark:bg-amber-900/10 rounded-[24px] px-6 py-4 flex items-center gap-4 border ring-1 ring-[#FF9E00]/10">
-        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-background shadow-sm ring-1 ring-black/5 text-[#FF9E00]">
+      <div class="bg-[#FFF4E5] dark:bg-[#FF9E00]/10 rounded-[24px] px-6 py-4 flex items-center gap-4 border ring-1 ring-[#FF9E00]/10">
+        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-black/5 text-[#FF9E00]">
           <Calendar class="w-5 h-5" />
         </div>
         <div class="flex flex-col text-[#FF9E00]">
@@ -25,9 +25,9 @@
 
     <div>
       <Tabs defaultValue="evolucoes" class="w-full">
-        <TabsList class="mb-6 bg-muted/50 rounded-full p-1.5 h-14 w-full max-w-[400px]">
-          <TabsTrigger value="evolucoes" class="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-[0_2px_10px_rgba(0,0,0,0.05)] data-[state=active]:text-primary h-full w-1/2 font-bold transition-all disabled:opacity-50">Evoluções</TabsTrigger>
-          <TabsTrigger value="dados" class="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-[0_2px_10px_rgba(0,0,0,0.05)] data-[state=active]:text-primary h-full w-1/2 font-bold transition-all disabled:opacity-50">Dados Clínicos</TabsTrigger>
+        <TabsList class="mb-6 bg-muted rounded-full p-1.5 h-14 w-full max-w-[400px]">
+          <TabsTrigger value="evolucoes" class="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-[0_2px_10px_rgba(0,0,0,0.05)] data-[state=active]:text-primary h-full w-1/2 font-bold transition-all disabled:opacity-50">Evoluções</TabsTrigger>
+          <TabsTrigger value="dados" class="rounded-full data-[state=active]:bg-card data-[state=active]:shadow-[0_2px_10px_rgba(0,0,0,0.05)] data-[state=active]:text-primary h-full w-1/2 font-bold transition-all disabled:opacity-50">Dados Clínicos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="evolucoes" class="space-y-4 outline-hidden focus:ring-0">
@@ -39,7 +39,7 @@
             >
               <div class="flex items-start justify-between mb-4">
                 <div class="flex items-center gap-4">
-                  <div class="h-12 w-12 flex items-center justify-center rounded-[16px] bg-[#E0F8FC] text-[#00C2C7]">
+                  <div class="h-12 w-12 flex items-center justify-center rounded-[16px] bg-[#E0F8FC] dark:bg-[#00C2C7]/20 text-[#00C2C7]">
                     <FileText class="w-6 h-6" />
                   </div>
                   <div>
@@ -49,7 +49,7 @@
                 </div>
                 
                 <div class="flex items-center gap-3">
-                  <Badge variant="outline" class="bg-[#F4F7FC] text-primary border-0 rounded-full font-bold px-3 py-1">Reg. #{{ evolucao.id }}</Badge>
+                  <Badge variant="outline" class="bg-muted text-primary border-0 rounded-full font-bold px-3 py-1">Reg. #{{ evolucao.id }}</Badge>
                   <button 
                       class="h-10 w-10 flex items-center justify-center rounded-full text-destructive hover:bg-destructive hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       @click="$emit('delete-evolucao', evolucao.id)"
@@ -61,11 +61,11 @@
               </div>
 
               <div class="space-y-4">
-                <div class="bg-background rounded-[24px] p-5">
+                <div class="bg-muted rounded-[24px] p-5">
                   <p class="text-[12px] font-bold text-muted-foreground mb-2 uppercase tracking-widest">Observações</p>
                   <p class="text-[15px] font-medium text-foreground leading-relaxed">{{ evolucao.observacoes }}</p>
                 </div>
-                <div v-if="evolucao.prescricoes && evolucao.prescricoes.length > 0" class="bg-[#F5E8FF] dark:bg-purple-900/10 rounded-[24px] p-5">
+                <div v-if="evolucao.prescricoes && evolucao.prescricoes.length > 0" class="bg-[#F5E8FF] dark:bg-[#A033FF]/20 rounded-[24px] p-5">
                   <p class="text-[12px] font-bold text-[#A033FF] mb-3 uppercase tracking-widest">Prescrições</p>
                   <ul class="space-y-2">
                     <li v-for="(prescricao, idx) in evolucao.prescricoes" :key="idx" class="text-[15px] font-bold text-foreground flex items-center gap-3">
@@ -78,8 +78,8 @@
             </div>
           </template>
           <template v-else>
-            <div class="bg-muted/50 rounded-[32px] py-16 flex flex-col items-center justify-center text-center gap-4">
-               <div class="h-16 w-16 bg-background rounded-full flex items-center justify-center shadow-sm">
+            <div class="bg-muted rounded-[32px] py-16 flex flex-col items-center justify-center text-center gap-4">
+               <div class="h-16 w-16 bg-card rounded-full flex items-center justify-center shadow-sm">
                   <FileText class="w-7 h-7 text-muted-foreground/50" />
                </div>
                <p class="text-[16px] font-bold text-muted-foreground">Nenhuma evolução registrada para este paciente.</p>

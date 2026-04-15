@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Cria as tabelas de cache do sistema.
+     * Run the migrations.
      */
     public function up(): void
     {
@@ -25,7 +25,7 @@ return new class extends Migration
     }
 
     /**
-     * Remove as tabelas de cache do banco.
+     * Reverse the migrations.
      */
     public function down(): void
     {
@@ -33,4 +33,3 @@ return new class extends Migration
         Schema::dropIfExists('cache_locks');
     }
 };
-    

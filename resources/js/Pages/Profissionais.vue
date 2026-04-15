@@ -88,20 +88,20 @@
         <!-- Search -->
         <div class="relative w-full max-w-md">
           <Search class="absolute left-5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"/>
-          <Input v-model="searchTerm" placeholder="Buscar por nome ou especialidade..." class="h-14 w-full rounded-full border-0 bg-card pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium text-foreground placeholder-muted-foreground transition-shadow"/>
+          <Input v-model="searchTerm" placeholder="Buscar por nome ou especialidade..." class="h-14 w-full rounded-full border-0 bg-card pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium"/>
         </div>
 
         <!-- Mini Stats -->
         <div class="flex gap-4"> 
             <div class="bg-card rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-3 flex items-center gap-4">
-                <div class="h-8 w-8 rounded-full bg-[#E8F0FF] dark:bg-blue-900/30 flex items-center justify-center">
-                   <span class="text-primary dark:text-blue-400 font-bold">{{ profissionais.length }}</span>
+                <div class="h-8 w-8 rounded-full bg-[#E8F0FF] dark:bg-[#4578FF]/20 flex items-center justify-center">
+                   <span class="text-primary font-bold">{{ profissionais.length }}</span>
                 </div>
                 <span class="text-sm font-bold text-muted-foreground">Profissionais</span>
             </div>
             <div class="bg-card rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-3 flex items-center gap-4">
-                <div class="h-8 w-8 rounded-full bg-[#E0F8FC] dark:bg-teal-900/30 flex items-center justify-center">
-                   <span class="text-[#00C2C7] dark:text-teal-400 font-bold text-xs">{{ totalHoras }}h</span>
+                <div class="h-8 w-8 rounded-full bg-[#E0F8FC] dark:bg-[#00C2C7]/20 flex items-center justify-center">
+                   <span class="text-[#00C2C7] font-bold text-xs">{{ totalHoras }}h</span>
                 </div>
                 <span class="text-sm font-bold text-muted-foreground">Horas Voluntárias</span>
             </div>
@@ -117,7 +117,7 @@
              <div class="flex-1">
                <div class="flex items-center justify-between">
                  <h3 class="text-[20px] font-bold text-foreground">{{ prof.nome }}</h3>
-                 <Badge variant="outline" class="bg-[#E0F8FC] text-[#00C2C7] border-0 font-extrabold uppercase tracking-wide text-[10px] px-3 py-0.5 rounded-full"> {{ prof.status || 'Ativo' }} </Badge>
+                 <Badge variant="outline" class="bg-[#E0F8FC] text-[#00C2C7] dark:bg-[#00C2C7]/20 border-0 font-extrabold uppercase tracking-wide text-[10px] px-3 py-0.5 rounded-full"> {{ prof.status || 'Ativo' }} </Badge>
                </div>
                <p class="text-[14px] font-medium text-primary mt-0.5">{{ prof.especialidade }}</p>
                <p class="text-[12px] font-bold text-muted-foreground mt-1 tracking-wide">CRM: {{ prof.crm }} &bull; ID: {{ prof.registro_interno }}</p> 
@@ -130,7 +130,7 @@
                <div><p class="text-muted-foreground font-medium">Email</p><p class="font-bold text-foreground truncate">{{ prof.email }}</p></div>
              </div>
              
-             <div class="bg-background rounded-[20px] p-4 space-y-3">
+             <div class="bg-muted rounded-[20px] p-4 space-y-3">
                <div class="flex items-center gap-2 text-[14px]"> 
                  <Calendar class="w-4 h-4 text-primary" /> 
                  <span class="font-bold text-foreground text-[13px] uppercase tracking-wider">Disponibilidade</span> 
@@ -145,19 +145,19 @@
              </div>
            </div>
 
-           <div class="flex items-center justify-between pt-4 border-t border-border/40">
+            <div class="flex items-center justify-between pt-4 border-t border-border/40">
               <div class="flex items-center gap-3"> 
-                <div class="h-10 w-10 rounded-full bg-[#E0F8FC] flex items-center justify-center">
+                <div class="h-10 w-10 rounded-full bg-[#E0F8FC] dark:bg-[#00C2C7]/20 flex items-center justify-center">
                   <span class="text-[14px] font-extrabold text-[#00C2C7]">{{ prof.horasvoluntarias || 0 }}h</span>
                 </div>
                 <span class="text-[12px] font-bold text-muted-foreground tracking-wide uppercase">Voluntariado</span> 
               </div>
               
               <div class="flex gap-2">
-                <button class="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#F4F7FC] text-[#00C2C7] hover:bg-[#00C2C7] hover:text-white transition-colors" @click="openEditDialog(prof)" title="Editar">
+                <button class="flex h-10 w-10 items-center justify-center rounded-[14px] bg-muted text-[#00C2C7] hover:bg-[#00C2C7] hover:text-white transition-colors" @click="openEditDialog(prof)" title="Editar">
                   <Edit class="w-4 h-4" />
                 </button>
-                <button class="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#F4F7FC] text-destructive hover:bg-destructive hover:text-white transition-colors" @click="abrirAlertaExclusao(prof.id)" title="Deletar">
+                <button class="flex h-10 w-10 items-center justify-center rounded-[14px] bg-muted text-destructive hover:bg-destructive hover:text-white transition-colors" @click="abrirAlertaExclusao(prof.id)" title="Deletar">
                   <Trash2 class="w-4 h-4" />
                 </button>
               </div>
@@ -166,7 +166,7 @@
       </div>
 
       <div v-if="filteredProfissionais.length === 0" class="flex flex-col items-center justify-center text-center py-16 bg-card rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
-        <div class="h-20 w-20 rounded-[24px] bg-muted/50 flex items-center justify-center mb-6">
+        <div class="h-20 w-20 rounded-[24px] bg-muted flex items-center justify-center mb-6">
           <Search class="h-8 w-8 text-muted-foreground" />
         </div>
         <p class="text-[15px] font-bold text-muted-foreground">

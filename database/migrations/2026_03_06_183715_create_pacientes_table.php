@@ -7,22 +7,22 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Cria a tabela de pacientes no banco de dados.
+     * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('pacientes', function (Blueprint $table) {
-            $table->id(); // ID único do paciente
-            $table->string('nome'); // Nome completo
-            $table->string('cpf')->unique()->nullable(); // CPF, não pode repetir. Opcional caso a pessoa não tenha na hora.
-            $table->string('telefone')->nullable(); // Contato
-            $table->date('data_nascimento')->nullable(); // Data de nasc
-            $table->timestamps(); // Registra quando o paciente foi criado e atualizado pela última vez
+            $table->id();
+            $table->string('nome');
+            $table->string('cpf')->unique()->nullable();
+            $table->string('telefone')->nullable();
+            $table->date('data_nascimento')->nullable();
+            $table->timestamps();
         });
     }
 
     /**
-     * Apaga a tabela caso o comando de rollback seja executado.
+     * Reverse the migrations.
      */
     public function down(): void
     {

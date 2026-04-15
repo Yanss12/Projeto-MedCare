@@ -79,7 +79,7 @@
 
       <div class="relative w-full max-w-md mb-8">
         <Search class="absolute left-5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5"/>
-        <Input v-model="searchTerm" placeholder="Buscar por nome ou CPF..." class="h-14 w-full rounded-full border-0 bg-card pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium text-foreground placeholder-muted-foreground transition-shadow"/>
+        <Input v-model="searchTerm" placeholder="Buscar por nome ou CPF..." class="h-14 w-full rounded-full border-0 bg-card pl-14 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-inset ring-border/30 focus:ring-2 focus:ring-inset focus:ring-primary outline-hidden text-[14px] font-medium"/>
       </div>
 
       <div class="grid gap-6">
@@ -94,7 +94,7 @@
                 <div class="space-y-2">
                   <div class="flex items-center gap-3">
                     <h3 class="text-[20px] font-bold text-foreground">{{ paciente.nome }}</h3>
-                    <Badge v-if="paciente.necessitatransporte" variant="secondary" class="bg-[#FFECCC] text-[#FF9E00] border-0 font-extrabold uppercase tracking-wide text-[10px] px-3 py-0.5 rounded-full">Necessita Transporte</Badge>
+                    <Badge v-if="paciente.necessitatransporte" variant="secondary" class="bg-[#FFECCC] uppercase tracking-wide text-[10px] px-3 py-0.5 rounded-full dark:bg-[#FF9E00]/20 text-[#FF9E00] border-0 font-extrabold">Necessita Transporte</Badge>
                   </div>
                   <p class="text-[14px] font-medium text-muted-foreground">CPF: {{ paciente.cpf }} • {{ paciente.idade || '--' }} anos</p>
                   
@@ -112,13 +112,13 @@
               </div>
 
               <div class="flex lg:flex-col gap-3">
-                <button class="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#F4F7FC] text-primary hover:bg-primary hover:text-white transition-colors" @click="openViewDialog(paciente)" title="Visualizar">
+                <button class="flex h-12 w-12 items-center justify-center rounded-[20px] bg-muted text-primary hover:bg-primary hover:text-white transition-colors" @click="openViewDialog(paciente)" title="Visualizar">
                   <Eye class="w-5 h-5" />
                 </button>
-                <button class="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#F4F7FC] text-[#00C2C7] hover:bg-[#00C2C7] hover:text-white transition-colors" @click="openEditDialog(paciente)" title="Editar">
+                <button class="flex h-12 w-12 items-center justify-center rounded-[20px] bg-muted text-[#00C2C7] hover:bg-[#00C2C7] hover:text-white transition-colors" @click="openEditDialog(paciente)" title="Editar">
                   <Edit class="w-5 h-5" />
                 </button>
-                <button class="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#F4F7FC] text-destructive hover:bg-destructive hover:text-white transition-colors" @click="abrirAlertaExclusao(paciente.id)" title="Deletar">
+                <button class="flex h-12 w-12 items-center justify-center rounded-[20px] bg-muted text-destructive hover:bg-destructive hover:text-white transition-colors" @click="abrirAlertaExclusao(paciente.id)" title="Deletar">
                   <Trash2 class="w-5 h-5" />
                 </button>
               </div>
@@ -127,7 +127,7 @@
       </div>
 
       <div v-if="filteredPacientes.length === 0" class="flex flex-col items-center justify-center text-center py-16 bg-card rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
-        <div class="h-20 w-20 rounded-[24px] bg-muted/50 flex items-center justify-center mb-6">
+        <div class="h-20 w-20 rounded-[24px] bg-muted flex items-center justify-center mb-6">
           <Search class="h-8 w-8 text-muted-foreground" />
         </div>
         <p class="text-[15px] font-bold text-muted-foreground">

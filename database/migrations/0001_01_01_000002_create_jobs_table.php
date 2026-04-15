@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Cria as tabelas de jobs do sistema.
+     * Run the migrations.
      */
     public function up(): void
     {
@@ -46,7 +46,7 @@ return new class extends Migration
     }
 
     /**
-     * Remove as tabelas de jobs do banco.
+     * Reverse the migrations.
      */
     public function down(): void
     {

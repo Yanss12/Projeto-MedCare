@@ -10,23 +10,27 @@
           </p>
         </div>
         
-        <Button @click="openAddDialog" class="rounded-full shadow-md shadow-primary/20 px-6 py-6 font-bold text-[14px]">
-          <Plus class="w-5 h-5 mr-2" />
-          Novo Agendamento
-        </Button>
+        <Dialog v-model:open="isAddEditDialogOpen">
+          <DialogTrigger as-child>
+            <Button @click="openAddDialog" class="rounded-full shadow-md shadow-primary/20 px-6 py-6 font-bold text-[14px]">
+              <Plus class="w-5 h-5 mr-2" />
+              Novo Agendamento
+            </Button>
+          </DialogTrigger>
+        </Dialog>
       </div>
 
       <Tabs default-value="proximos" class="w-full">
         <TabsList class="mb-6 bg-card rounded-full p-1.5 h-16 w-full max-w-[600px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20">
-          <TabsTrigger value="proximos" class="rounded-full data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-none h-full w-1/2 text-[15px] font-bold transition-all">Próximos</TabsTrigger>
-          <TabsTrigger value="historico" class="rounded-full data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-none h-full w-1/2 text-[15px] font-bold transition-all">Histórico & Concluídos</TabsTrigger>
+          <TabsTrigger value="proximos" class="rounded-full data-[state=active]:bg-muted data-[state=active]:text-primary data-[state=active]:shadow-none h-full w-1/2 text-[15px] font-bold transition-all">Próximos</TabsTrigger>
+          <TabsTrigger value="historico" class="rounded-full data-[state=active]:bg-muted data-[state=active]:text-primary data-[state=active]:shadow-none h-full w-1/2 text-[15px] font-bold transition-all">Histórico & Concluídos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="proximos" class="space-y-6 mt-6 outline-hidden focus:ring-0">
           
           <div class="flex flex-col md:flex-row gap-4 mb-8"> 
             <div class="bg-card rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-4 flex items-center gap-5 flex-1 hover:shadow-md transition-all">
-                <div class="h-14 w-14 rounded-[20px] bg-[#E8F0FF] dark:bg-blue-900/30 flex items-center justify-center">
+                <div class="h-14 w-14 rounded-[20px] bg-[#E8F0FF] dark:bg-[#4578FF]/20 flex items-center justify-center">
                    <CalendarIcon class="w-6 h-6 text-primary" />
                 </div>
                 <div class="flex flex-col">
@@ -36,7 +40,7 @@
             </div>
             
             <div class="bg-card rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-4 flex items-center gap-5 flex-1 hover:shadow-md transition-all">
-                <div class="h-14 w-14 rounded-[20px] bg-[#E0F8FC] dark:bg-teal-900/30 flex items-center justify-center">
+                <div class="h-14 w-14 rounded-[20px] bg-[#E0F8FC] dark:bg-[#00C2C7]/20 flex items-center justify-center">
                    <CheckCircle class="w-6 h-6 text-[#00C2C7]" />
                 </div>
                 <div class="flex flex-col">
@@ -46,7 +50,7 @@
             </div>
             
             <div class="bg-card rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 px-6 py-4 flex items-center gap-5 flex-1 hover:shadow-md transition-all">
-                <div class="h-14 w-14 rounded-[20px] bg-[#FFECCC] dark:bg-amber-900/30 flex items-center justify-center">
+                <div class="h-14 w-14 rounded-[20px] bg-[#FFECCC] dark:bg-[#FF9E00]/20 flex items-center justify-center">
                    <Clock class="w-6 h-6 text-[#FF9E00]" />
                 </div>
                 <div class="flex flex-col">
@@ -69,7 +73,7 @@
             </template>
             <template v-else>
               <div class="flex flex-col items-center justify-center text-center py-16 bg-card rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
-                <div class="h-20 w-20 rounded-[24px] bg-muted/50 flex items-center justify-center mb-6">
+                <div class="h-20 w-20 rounded-[24px] bg-muted flex items-center justify-center mb-6">
                   <CalendarIcon class="h-8 w-8 text-primary" />
                 </div>
                 <p class="text-[16px] font-bold text-muted-foreground">Nenhuma consulta futura agendada.</p>
@@ -82,14 +86,14 @@
           <div class="flex flex-col md:flex-row items-center gap-4 bg-card rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] ring-1 ring-border/20 p-4 mb-8">
             
              <div class="flex items-center gap-3 w-full md:w-auto">
-               <div class="h-12 w-12 flex shrink-0 items-center justify-center bg-background rounded-[16px]">
+               <div class="h-12 w-12 flex shrink-0 items-center justify-center bg-muted rounded-[16px]">
                  <CalendarIcon class="w-5 h-5 text-primary" />
                </div>
                <Popover>
                   <PopoverTrigger as-child>
                     <Button
                       variant="outline"
-                      :class="['w-full md:w-65 justify-start text-left font-bold rounded-[16px] h-12 border-0 bg-background text-[14px] shadow-none hover:bg-muted/50 hover:text-primary transition-colors', !historyDateValue && 'text-muted-foreground']"
+                      :class="['w-full md:w-65 justify-start text-left font-bold rounded-[16px] h-12 border-0 bg-muted text-[14px] shadow-none hover:bg-muted/80 hover:text-primary transition-colors', !historyDateValue && 'text-muted-foreground']"
                     >
                       {{ historyDateValue ? formatDateDisplay(historyDateValue) : "Filtrar por data" }}
                     </Button>
@@ -111,11 +115,11 @@
              <div class="h-8 w-[1px] bg-border/50 hidden md:block mx-1"></div>
 
              <div class="flex items-center gap-3 w-full md:w-auto flex-1 max-w-[400px]">
-               <div class="h-12 w-12 flex shrink-0 items-center justify-center bg-background rounded-[16px]">
+               <div class="h-12 w-12 flex shrink-0 items-center justify-center bg-muted rounded-[16px]">
                  <User class="w-5 h-5 text-primary" />
                </div>
                <Select v-model="historyProfessionalFilter">
-                 <SelectTrigger class="w-full rounded-[16px] h-12 border-0 bg-background font-bold text-[14px] shadow-none focus:ring-primary focus:ring-2">
+                 <SelectTrigger class="w-full rounded-[16px] h-12 border-0 bg-muted font-bold text-[14px] shadow-none focus:ring-primary focus:ring-2">
                    <SelectValue placeholder="Filtrar por profissional" />
                  </SelectTrigger>
                  <SelectContent class="rounded-[20px] shadow-xl border border-border/50">
@@ -143,7 +147,7 @@
             </template>
             <template v-else>
               <div class="flex flex-col items-center justify-center text-center py-16 bg-card rounded-[36px] shadow-sm ring-1 ring-border/20 mt-6">
-                <div class="h-20 w-20 rounded-[24px] bg-muted/50 flex items-center justify-center mb-6">
+                <div class="h-20 w-20 rounded-[24px] bg-muted flex items-center justify-center mb-6">
                   <Search class="h-8 w-8 text-muted-foreground" />
                 </div>
                 <p class="text-[16px] font-bold text-muted-foreground">Nenhum histórico encontrado para esta seleção.</p>
@@ -278,7 +282,7 @@
 import { ref, computed, watch } from 'vue';
 import { useForm, router, Head } from '@inertiajs/vue3';
 import Layout from '@/Components/Layout.vue';
-import { Plus, Calendar as CalendarIcon, Search, CheckCircle, Clock, X, User } from 'lucide-vue-next';
+import { Plus, Calendar as CalendarIcon } from 'lucide-vue-next';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import AgendamentoCard from '@/Components/AgendamentoCard.vue';
@@ -498,9 +502,9 @@ const openEditDialog = (agendamento) => {
   if (agendamento.data) dateValue.value = parseDate(agendamento.data); else dateValue.value = undefined;
   
   form.paciente = agendamento.paciente_id ? agendamento.paciente_id.toString() : null;
-  form.profissional = agendamento.profissional_id ? agendamento.profissional_id.toString() : null; 
+  form.profissional = agendamento.profissional_id ? agendamento.profissional_id.toString() : '';
   form.data_consulta = agendamento.data;
-  form.horario = agendamento.horario;
+  form.horario = agendamento.horario ? agendamento.horario.slice(0, 5) : '';
   form.status = agendamento.status; 
   
   isDialogOpen.value = true;

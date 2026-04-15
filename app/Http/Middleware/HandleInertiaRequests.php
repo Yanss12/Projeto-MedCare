@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use App\Models\Notification;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -41,14 +40,6 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'flash' => [
-                'success' => fn () => $request->session()->get('success'),
-                'error' => fn () => $request->session()->get('error'),
-                'message' => fn () => $request->session()->get('message'),
-            ],
-            'notifications' => fn () => $request->user() 
-                ? Notification::where('user_id', $request->user()->id)->orderBy('created_at', 'desc')->get() 
-                : []
         ];
     }
 }
