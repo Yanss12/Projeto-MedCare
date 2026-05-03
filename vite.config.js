@@ -20,7 +20,17 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        // Configuração para funcionar dentro do Docker
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: 'localhost',
+        },
         watch: {
+            // usePolling é necessário quando o código está montado via volume Docker
+            // (o sistema de arquivos do container não detecta mudanças do host nativamente)
+            usePolling: true,
             ignored: ['**/storage/framework/views/**'],
         },
     },

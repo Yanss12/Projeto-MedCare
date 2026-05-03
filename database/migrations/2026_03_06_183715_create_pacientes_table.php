@@ -12,12 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pacientes', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // PK interna para performance de JOINs (nunca exposta)
+            $table->uuid('uuid')->unique(); // Identificador público da API
             $table->string('nome');
-            $table->string('cpf')->unique()->nullable();
-            $table->string('telefone')->nullable();
+            $table->text('cpf_encrypted')->nullable()->comment('CPF criptografado (LGPD)');
+            $table->text('telefone_encrypted')->nullable()->comment('Telefone criptografado (LGPD)');
             $table->date('data_nascimento')->nullable();
             $table->timestamps();
+            $table->softDeletes(); // Nunca deletar fisicamente (Retenção LGPD)
+            $table->index('uuid'); // Index para busca rápida por UUID
         });
     }
 

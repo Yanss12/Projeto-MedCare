@@ -1,12 +1,15 @@
 <template>
   <div class="flex h-screen w-full bg-background overflow-hidden relative">
     <!-- Sidebar -->
-    <aside class="hidden w-[90px] flex-col items-center border-r border-border/50 bg-card py-8 md:flex z-10 shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
-      <div class="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-        <HeartPulse class="h-7 w-7" />
+    <aside class="group hidden w-[90px] hover:w-[120px] transition-all duration-300 flex-col items-center border-r border-border/50 bg-card py-8 md:flex z-10 shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
+      <div class="mb-8 flex flex-col items-center justify-center">
+        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+          <HeartPulse class="h-7 w-7" />
+        </div>
+        <span class="mt-0 text-xs font-bold text-primary opacity-0 h-0 overflow-hidden group-hover:opacity-100 group-hover:h-auto group-hover:mt-2 transition-all duration-300">MEDCARE</span>
       </div>
 
-      <nav class="flex flex-1 flex-col gap-4">
+      <nav class="flex flex-1 flex-col gap-4 w-full px-2">
         <NavLink href="/" :icon="LayoutDashboard" title="Dashboard" />
         <NavLink href="/pacientes" :icon="Users" title="Pacientes" />
         <NavLink href="/profissionais" :icon="UserCheck" title="Profissionais" />

@@ -17,9 +17,9 @@
 
            <!-- 3 Cards -->
            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-             <StatCard title="Total Pacientes" :value="totalPacientes.toString()" subtitle="Pacientes Cadastrados" :icon="Users" colorId="blue" />
-             <StatCard title="Profissionais" :value="totalProfissionais.toString()" subtitle="Médicos Ativos" :icon="UserCheck" colorId="teal" />
-             <StatCard title="Consultas Hoje" :value="countConsultasHoje.toString()" subtitle="Agendamentos" :icon="CalendarDays" colorId="purple" />
+             <StatCard title="Total Pacientes" :value="totalPacientes.toString()" subtitle="Pacientes Cadastrados" :icon="Users" colorId="blue" image="/images/patient_icon.png" />
+             <StatCard title="Profissionais" :value="totalProfissionais.toString()" subtitle="Médicos Ativos" :icon="UserCheck" colorId="teal" image="/images/doctor_icon.png" />
+             <StatCard title="Consultas Hoje" :value="countConsultasHoje.toString()" subtitle="Agendamentos" :icon="CalendarDays" colorId="purple" image="/images/calendar_icon.png" />
            </div>
 
            <!-- Activity Chart Mock -->
@@ -33,25 +33,13 @@
                </div>
              </div>
              <div class="px-8 pb-8 pt-6 relative z-10">
-               <div class="relative w-full h-[280px] bg-card rounded-2xl flex items-end">
-                 <!-- SVG dynamically generated chart -->
-                 <svg preserveAspectRatio="none" class="w-full h-full" viewBox="0 0 1000 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Grid lines -->
-                    <line x1="0" y1="250" x2="1000" y2="250" stroke="#F1F5F9" stroke-linecap="round" stroke-width="2" stroke-dasharray="8 8" />
-                    <line x1="0" y1="150" x2="1000" y2="150" stroke="#F1F5F9" stroke-linecap="round" stroke-width="2" stroke-dasharray="8 8" />
-                    <line x1="0" y1="50" x2="1000" y2="50" stroke="#F1F5F9" stroke-linecap="round" stroke-width="2" stroke-dasharray="8 8" />
-                    
-                    <path :d="svgPath" stroke="#4578FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" class="transition-all duration-500 ease-in-out"/>
-                    
-                    <!-- Floating Tooltip dots -> only for the last point for aesthetics -->
-                    <circle v-if="chartData.length" :cx="lastPointX" :cy="lastPointY" r="8" fill="hsl(var(--card))" stroke="#4578FF" stroke-width="5" class="drop-shadow-md transition-all duration-500 ease-in-out" />
-                 </svg>
-                 
-                 <!-- Tooltip HTML mapped to last point approx -->
-                 <div class="absolute top-0 right-0 bg-card px-5 py-3 rounded-[20px] shadow-xl ring-1 ring-border/10 flex flex-col items-center">
-                   <span class="text-base font-extrabold text-foreground">{{ totalInChart }} Consultas</span>
-                   <span class="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5">{{ chartMode }}</span>
-                 </div>
+               <div class="relative w-full h-[320px] bg-card rounded-2xl">
+                 <VueApexCharts 
+                   type="area" 
+                   height="100%" 
+                   :options="chartOptions" 
+                   :series="chartSeries" 
+                 />
                </div>
              </div>
            </div>
@@ -164,6 +152,7 @@ import {
 import StatCard from '@/Components/dashboard/StatCard.vue';
 import AppointmentItem from '@/Components/dashboard/AppointmentItem.vue';
 import { ref, computed } from 'vue';
+import VueApexCharts from 'vue3-apexcharts';
 
 const props = defineProps({
     totalPacientes: { type: Number, default: 0 },
@@ -254,7 +243,6 @@ const chartData = computed(() => {
            pts.push(m); tot+=m;
        }
     } else if (chartMode.value === 'Mensal') {
-       // Just grab last 30 days and group nicely to 4 points / weeks to look good in the line chart
        let p1=0,p2=0,p3=0,p4=0;
        for(let i=29; i>=0; i--){
            const d = new Date(); d.setDate(today.getDate() - i);
@@ -276,30 +264,68 @@ const chartData = computed(() => {
     return pts;
 });
 
-const lastPointX = ref(1000);
-const lastPointY = ref(250);
+const chartSeries = computed(() => {
+    return [{
+        name: 'Consultas',
+        data: chartData.value
+    }];
+});
 
-const svgPath = computed(() => {
-    const data = chartData.value;
-    if (data.length === 0) return '';
-    const max = Math.max(...data, 10);
-    const w = 1000;
-    const stepX = w / (data.length - 1 || 1);
-    
-    const points = data.map((val, i) => {
-        return { x: i * stepX, y: 250 - (val / max) * 180 };
-    });
-
-    lastPointX.value = points[points.length - 1].x;
-    lastPointY.value = points[points.length - 1].y;
-
-    let d = `M ${points[0].x} ${points[0].y}`;
-    for (let i = 0; i < points.length - 1; i++) {
-        const p1 = points[i];
-        const p2 = points[i + 1];
-        const cx1 = (p1.x + p2.x) / 2;
-        d += ` C ${cx1} ${p1.y}, ${cx1} ${p2.y}, ${p2.x} ${p2.y}`;
+const chartOptions = computed(() => {
+    let categories = [];
+    if (chartMode.value === 'Semanal') {
+        for(let i=6; i>=0; i--) {
+            const d = new Date(); d.setDate(today.getDate() - i);
+            categories.push(d.toLocaleDateString('pt-BR', { weekday: 'short' }));
+        }
+    } else if (chartMode.value === 'Mensal') {
+        categories = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
+    } else {
+        categories = monthNames.map(m => m.substring(0, 3));
     }
-    return d;
+
+    return {
+        chart: {
+            type: 'area',
+            fontFamily: 'inherit',
+            toolbar: { show: false },
+            zoom: { enabled: false },
+            background: 'transparent'
+        },
+        colors: ['#3b82f6'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.4,
+                opacityTo: 0.05,
+                stops: [0, 90, 100]
+            }
+        },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 3 },
+        xaxis: {
+            categories: categories,
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { style: { colors: '#64748b', fontSize: '12px' } },
+            tooltip: { enabled: false }
+        },
+        yaxis: {
+            show: false
+        },
+        grid: {
+            borderColor: '#334155',
+            strokeDashArray: 4,
+            xaxis: { lines: { show: false } },
+            yaxis: { lines: { show: true } },
+            padding: { top: 0, right: 0, bottom: 0, left: 10 }
+        },
+        theme: { mode: 'dark' },
+        tooltip: {
+            theme: 'dark',
+            y: { formatter: (val) => val + " consultas" }
+        }
+    };
 });
 </script>

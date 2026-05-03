@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('evolucoes', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique(); // Identificador público da API
             $table->foreignId('paciente_id')->constrained('pacientes')->cascadeOnDelete();
             $table->foreignId('profissional_id')->constrained('profissionais')->cascadeOnDelete();
-            $table->text('descricao');
-            $table->date('data_registro');
+            $table->text('descricao_encrypted')->comment('Evolução clínica criptografada (PHI)');
+            $table->dateTime('data_hora');
             $table->timestamps();
+            $table->softDeletes(); // Nunca deletar fisicamente
+            $table->index('uuid');
         });
     }
 

@@ -12,13 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('profissionais', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // PK interna para relacionamentos
+            $table->uuid('uuid')->unique(); // Identificador público da API
             $table->string('nome');
             $table->string('especialidade');
-            $table->string('crm')->nullable();
-            $table->string('telefone')->nullable();
-            $table->string('email')->nullable();
+            $table->text('crm_encrypted')->nullable()->comment('CRM criptografado (PII)');
+            $table->text('telefone_encrypted')->nullable()->comment('Telefone criptografado (PII)');
+            $table->text('email_encrypted')->nullable()->comment('Email criptografado (PII)');
             $table->timestamps();
+            $table->softDeletes(); // Nunca deletar fisicamente
+            $table->index('uuid'); // Index para busca rápida
         });
     }
 

@@ -12,12 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('agendamentos', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // PK interna para relacionamentos
+            $table->uuid('uuid')->unique(); // Identificador público da API
             $table->foreignId('paciente_id')->constrained('pacientes')->cascadeOnDelete();
             $table->foreignId('profissional_id')->constrained('profissionais')->cascadeOnDelete();
             $table->dateTime('data_hora');
             $table->string('status')->default('agendado');
             $table->timestamps();
+            $table->softDeletes(); // Nunca deletar fisicamente (Retenção LGPD)
+            $table->index('uuid'); // Index para busca rápida
         });
     }
 

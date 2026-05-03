@@ -3,59 +3,96 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\ProfissionalRequest;
+use App\Http\Resources\ProfissionalResource;
 use App\Models\Profissional;
+use Illuminate\Http\JsonResponse;
 
 class ProfissionalController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return response()->json(Profissional::all());
+        $profissionais = Profissional::all();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profissionais listados com sucesso.',
+            'data' => ProfissionalResource::collection($profissionais)
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(ProfissionalRequest $request): JsonResponse
     {
-        $profissional = Profissional::create($request->all());
-        return response()->json($profissional, 201);
+        $validated = $request->validated();
+        
+        $profissional = Profissional::create($this->mapData($validated));
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profissional cadastrado com sucesso.',
+            'data' => new ProfissionalResource($profissional),
+        ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(string $uuid): JsonResponse
     {
-        $profissional = Profissional::findOrFail($id);
-        return response()->json($profissional);
+        $profissional = Profissional::where('uuid', $uuid)->firstOrFail();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profissional carregado.',
+            'data' => new ProfissionalResource($profissional),
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(ProfissionalRequest $request, string $uuid): JsonResponse
     {
-        $profissional = Profissional::findOrFail($id);
-        $profissional->update($request->all());
-        return response()->json($profissional);
+        $profissional = Profissional::where('uuid', $uuid)->firstOrFail();
+        
+        $profissional->update($this->mapData($request->validated()));
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profissional atualizado com sucesso.',
+            'data' => new ProfissionalResource($profissional),
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(string $uuid): JsonResponse
     {
-        $profissional = Profissional::findOrFail($id);
+        $profissional = Profissional::where('uuid', $uuid)->firstOrFail();
 
+        // Evita exclusão se houver histórico clínico associado
         if ($profissional->agendamentos()->count() > 0 || $profissional->evolucoes()->count() > 0) {
-            return response()->json(['error' => 'Não é possível excluir: Este profissional possui agendamentos ou histórico clínico. Por favor, edite o cadastro e mude o status para Inativo.'], 400);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Não é possível excluir: Este profissional possui histórico e não pode ser apagado do sistema.',
+                'data' => []
+            ], 400);
         }
 
         $profissional->delete();
-        return response()->json(null, 204);
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profissional removido com sucesso.',
+            'data' => []
+        ]);
+    }
+
+    private function mapData(array $validated): array
+    {
+        return [
+            'nome' => $validated['nome'],
+            'especialidade' => $validated['especialidade'],
+            'crm_encrypted' => $validated['crm'] ?? null,
+            'telefone_encrypted' => $validated['telefone'] ?? null,
+            'email_encrypted' => $validated['email'] ?? null,
+            'registro_interno' => $validated['registro_interno'] ?? null,
+            'horasvoluntarias' => $validated['horasvoluntarias'] ?? 0,
+            'disponibilidade' => $validated['disponibilidade'] ?? null,
+            'horarios' => $validated['horarios'] ?? null,
+            'status' => $validated['status'] ?? 'ativo',
+        ];
     }
 }

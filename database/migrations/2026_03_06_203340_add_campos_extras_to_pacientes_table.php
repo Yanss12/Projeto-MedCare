@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pacientes', function (Blueprint $table) {
-            $table->string('endereco')->nullable();
+            $table->text('endereco_encrypted')->nullable()->comment('Endereço criptografado (LGPD)');
             $table->boolean('necessitatransporte')->default(false);
-            $table->text('diagnostico')->nullable();
-            $table->json('alergias')->nullable();
-            $table->json('medicamentoscontrolados')->nullable();
+            $table->text('diagnostico_encrypted')->nullable()->comment('Diagnóstico criptografado (PHI/LGPD)');
+            $table->text('alergias_encrypted')->nullable()->comment('Alergias em JSON criptografado (PHI)');
+            $table->text('medicamentoscontrolados_encrypted')->nullable()->comment('Medicamentos em JSON criptografado (PHI)');
         });
     }
 
@@ -27,11 +27,11 @@ return new class extends Migration
     {
         Schema::table('pacientes', function (Blueprint $table) {
             $table->dropColumn([
-                'endereco',
+                'endereco_encrypted',
                 'necessitatransporte',
-                'diagnostico',
-                'alergias',
-                'medicamentoscontrolados'
+                'diagnostico_encrypted',
+                'alergias_encrypted',
+                'medicamentoscontrolados_encrypted'
             ]);
         });
     }

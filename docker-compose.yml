@@ -1,0 +1,97 @@
+# =============================================================================
+# Docker Compose - MedCare
+# =============================================================================
+# Serviços:
+#   - app:   PHP 8.3 FPM (Laravel) + Composer
+#   - node:  Node.js 20 (Vite dev server com hot reload)
+#   - nginx: Servidor web (proxy para PHP-FPM e Vite)
+# =============================================================================
+
+services:
+  # -------------------------------------------------------
+  # APP - PHP 8.3 FPM (Laravel Backend)
+  # -------------------------------------------------------
+  # Este container roda o PHP-FPM que processa as requisições
+  # PHP enviadas pelo Nginx. Ele contém todo o código Laravel.
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medcare-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      # Monta o código local dentro do container (sincroniza mudanças)
+      - .:/var/www/html
+      # Volumes nomeados para preservar vendor e node_modules do container
+      # (evita conflito entre SO host e container)
+      - vendor:/var/www/html/vendor
+      - node_modules:/var/www/html/node_modules
+      # Volume dedicado para o banco SQLite — garante persistência
+      # mesmo que o container seja destruído (retenção LGPD)
+      - sqlite_data:/var/www/html/database
+    environment:
+      # Variáveis para o PHP se conectar corretamente
+      PHP_OPCACHE_VALIDATE_TIMESTAMPS: 1
+    networks:
+      - medcare-network
+    depends_on:
+      - nginx
+
+  # -------------------------------------------------------
+  # NODE - Vite Dev Server (Hot Module Replacement)
+  # -------------------------------------------------------
+  # Este container roda o Vite em modo de desenvolvimento.
+  # Ele compila Vue, Tailwind CSS e serve os assets com HMR.
+  node:
+    image: node:20-alpine
+    container_name: medcare-node
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - node_modules:/var/www/html/node_modules
+    # Instala dependências e inicia o Vite dev server
+    command: sh -c "npm install && npx vite --host 0.0.0.0 --port 5173"
+    ports:
+      # Porta do Vite — restrita a localhost por segurança
+      # (impede acesso de outras máquinas na rede ao Vite dev server)
+      - "127.0.0.1:5173:5173"
+    networks:
+      - medcare-network
+
+  # -------------------------------------------------------
+  # NGINX - Servidor Web (Reverse Proxy)
+  # -------------------------------------------------------
+  # O Nginx recebe todas as requisições HTTP e:
+  #   - Arquivos estáticos: serve diretamente
+  #   - Requisições PHP: encaminha para o container "app" (PHP-FPM)
+  nginx:
+    image: nginx:alpine
+    container_name: medcare-nginx
+    restart: unless-stopped
+    ports:
+      # Porta 8000 restrita a localhost por segurança
+      - "127.0.0.1:8000:80"
+    volumes:
+      # Monta o código para servir arquivos estáticos
+      - .:/var/www/html
+      # Configuração customizada do Nginx
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - medcare-network
+
+# -------------------------------------------------------
+# Redes - Permite os containers se comunicarem entre si
+# -------------------------------------------------------
+networks:
+  medcare-network:
+    driver: bridge
+
+# -------------------------------------------------------
+# Volumes nomeados - Persistem dados entre restarts
+# -------------------------------------------------------
+volumes:
+  vendor:
+  node_modules:
+  sqlite_data:    # Banco SQLite persistente — nunca perde dados entre restarts

@@ -1,0 +1,52 @@
+# =============================================================================
+# .dockerignore
+# =============================================================================
+# Funciona como o .gitignore, mas para o Docker.
+# Arquivos listados aqui NÃO são copiados para dentro da imagem
+# durante o "docker build". Isso torna o build mais rápido e a
+# imagem mais leve.
+# =============================================================================
+
+# Dependências (serão instaladas dentro do container)
+/vendor
+/node_modules
+
+# Build dos assets (será gerado dentro do container)
+/public/build
+/public/hot
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+.fleet
+.nova
+.zed
+
+# Docker (evita loop infinito de contexto)
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Ambiente local (o container terá seu próprio .env)
+.env
+.env.backup
+.env.production
+
+# Logs e cache
+*.log
+.phpunit.cache
+.phpunit.result.cache
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# Outros
+README.md
+Thumbs.db
+.DS_Store

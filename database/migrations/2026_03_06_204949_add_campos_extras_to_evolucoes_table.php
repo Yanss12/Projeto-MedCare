@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('evolucoes', function (Blueprint $table) {
-            $table->renameColumn('descricao', 'observacoes');
-            $table->json('prescricoes')->nullable();
-            $table->string('profissional')->nullable();
+            $table->string('tipo_atendimento')->nullable();
+            $table->text('sinais_vitais_encrypted')->nullable()->comment('Sinais vitais em JSON criptografado (PHI)');
+            $table->text('prescricao_encrypted')->nullable()->comment('Prescrição criptografada (PHI)');
         });
     }
 
@@ -24,8 +24,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('evolucoes', function (Blueprint $table) {
-            $table->dropColumn(['prescricoes', 'profissional']);
-            $table->renameColumn('observacoes', 'descricao');
+            $table->dropColumn([
+                'tipo_atendimento',
+                'sinais_vitais_encrypted',
+                'prescricao_encrypted'
+            ]);
         });
     }
 };
