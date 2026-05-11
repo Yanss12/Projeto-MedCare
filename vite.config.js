@@ -20,7 +20,26 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        // Configuração para funcionar dentro do Docker
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
+        // Permite que qualquer origem (localhost:8000) carregue assets do Vite (localhost:5173)
+        cors: {
+            origin: '*',
+            methods: ['GET', 'HEAD', 'OPTIONS'],
+            allowedHeaders: ['*'],
+        },
+        // origin informa ao plugin Laravel qual URL pública usar nos <script> gerados
+        origin: 'http://localhost:5173',
+        hmr: {
+            host: 'localhost',
+            port: 5173,
+        },
         watch: {
+            // usePolling é necessário quando o código está montado via volume Docker
+            usePolling: true,
+            interval: 500,
             ignored: ['**/storage/framework/views/**'],
         },
     },
